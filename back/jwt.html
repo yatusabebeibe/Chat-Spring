@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Auth API</title>
+</head>
+<body>
+
+<h2>Registro</h2>
+<input type="text" id="reg_usuario" placeholder="Username"><br>
+<input type="password" id="reg_password" placeholder="Password"><br>
+<button onclick="registrar()">Registrar</button>
+
+<h2>Login</h2>
+<input type="text" id="log_usuario" placeholder="Username"><br>
+<input type="password" id="log_password" placeholder="Password"><br>
+<button onclick="login()">Login</button>
+
+<h2>Logout</h2>
+<button onclick="logout()">Logout</button>
+
+<pre id="resultado"></pre>
+
+<script>
+const API = "http://localhost:8080/api/auth";
+
+function registrar() {
+    fetch(API + "/registro", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            usuario: document.getElementById("reg_usuario").value,
+            password: document.getElementById("reg_password").value
+        }),
+        credentials: "include"
+    })
+    .then(r => r.json())
+    .then(data => mostrar(data))
+    .catch(e => mostrar(e));
+}
+
+function login() {
+    fetch(API + "/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            usuario: document.getElementById("log_usuario").value,
+            password: document.getElementById("log_password").value
+        }),
+        credentials: "include"
+    })
+    .then(r => r.json())
+    .then(data => mostrar(data))
+    .catch(e => mostrar(e));
+}
+
+function logout() {
+    fetch(API + "/logout", {
+        method: "POST",
+        credentials: "include"
+    })
+    .then(() => mostrar("Logout OK"))
+    .catch(e => mostrar(e));
+}
+
+function mostrar(data) {
+    document.getElementById("resultado").textContent = JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>

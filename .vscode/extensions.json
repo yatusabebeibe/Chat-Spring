@@ -1,0 +1,14 @@
+{
+    "recommendations": [
+        "formulahendry.code-runner",
+        "pkief.material-icon-theme",
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-boot-dev-pack",
+        "zhuangtongfa.material-theme",
+        "oderwat.indent-rainbow",
+        "usernamehw.errorlens",
+        "humao.rest-client",
+        "mtxr.sqltools-driver-mysql",
+        "mtxr.sqltools"
+    ]
+}

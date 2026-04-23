@@ -1,0 +1,47 @@
+{
+    "java.dependency.packagePresentation": "hierarchical",
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "maven.view": "hierarchical",
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.colorTheme": "One Dark Pro",
+    "editor.codeLens": true,
+    "editor.inlineSuggest.enabled": true,
+    "git.suggestSmartCommit": false,
+    "editor.minimap.size": "fit",
+    "editor.minimap.showSlider": "always",
+    "code-runner.runInTerminal": true,
+    "code-runner.temporaryFileName": "CodeRunnerTempFile",
+    "terminal.integrated.defaultProfile.windows": "PowerShell",
+    "files.encoding": "utf8",
+    "files.autoGuessEncoding": true,
+    "terminal.integrated.env.windows": {
+        "LANG": "en_US.UTF-8",
+        "LC_ALL": "en_US.UTF-8"
+    },
+    "workbench.sideBar.location": "right",
+    "workbench.activityBar.location": "top",
+    "editor.fontLigatures": true,
+    "java.project.explorer.showNonJavaResources": true,
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "curso",
+            "database": "chat",
+            "username": "usuario",
+            "password": "password"
+        }
+    ],
+    "emmet.includeLanguages": {
+        "jsp": "html"
+    },
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx12G -Xms100m -Xlog:disable",
+    "java.compile.nullAnalysis.mode": "automatic",
+}
