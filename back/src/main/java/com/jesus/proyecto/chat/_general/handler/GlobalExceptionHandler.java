@@ -10,32 +10,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.jesus.proyecto.chat._general.exceptions.AC_CustomException;
-import com.jesus.proyecto.chat._general.exceptions.AuthException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AC_CustomException.class)
-    public ResponseEntity<Map<String, String>> handleCustomException(AC_CustomException e) {
-        Map<String, String> response = new HashMap<>();
-        response.put("error", e.getMensaje());
-        return ResponseEntity.status(e.getCodigoError()).body(response);
-    }
+    public ResponseEntity<Map<String, Object>> handleCustomException(AC_CustomException e) {
 
-    @ExceptionHandler(AuthException.class)
-    public ResponseEntity<Map<String, Object>> handleAuthException(AuthException e) {
-        
         Map<String, Object> response = new HashMap<>();
 
         // Si hay detalles de validación específicos
         if (e.getDetalles() != null && !e.getDetalles().isEmpty()) {
             response.put("error", e.getDetalles());
-            return ResponseEntity.status(e.getCodigoError()).body(response);
         } else {
             // Error único
             response.put("error", e.getMensaje());
-            return ResponseEntity.status(e.getCodigoError()).body(response);
         }
+        return ResponseEntity.status(e.getCodigoError()).body(response);
     }
 
 

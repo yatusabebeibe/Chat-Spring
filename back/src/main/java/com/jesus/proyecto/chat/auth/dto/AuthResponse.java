@@ -10,9 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
-    private UUID id;                    // ID del usuario (opcional)
-    private String usuario;             // Username para display
-    private String nombre;              // Nombre completo
-    private String accessToken;         // Token para acceso al API
-    private String refreshToken;        // Token para renovar access
+    private UUID id;
+    private String usuario;
+    private String nombre;
 }

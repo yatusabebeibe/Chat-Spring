@@ -3,6 +3,7 @@ package com.jesus.proyecto.chat.auth.service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
@@ -65,7 +66,7 @@ public class JwtService {
                 .compact();
     }
 
-    // Un claim es un dato del JWT (sujeto, expliracion y demas)
+    // Un claim es un dato del JWT (usuario (subject), expliracion y demas)
     private <T> T extraerClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
 
@@ -82,5 +83,11 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+
+    public UUID extraerUsuarioId(String token) {
+        String id = extraerClaim(token, claims -> claims.get("userId", String.class));
+        return UUID.fromString(id);
     }
 }

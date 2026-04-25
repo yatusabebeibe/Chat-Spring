@@ -15,9 +15,6 @@ public class MensajeRequest {
     @NotNull(message = "El chat es obligatorio")
     private UUID chatId;
 
-    @NotNull(message = "El usuario que envía es obligatorio")
-    private UUID usuarioId;
-
     @NotNull(message = "El tipo de mensaje es obligatorio")
     private TipoMensaje tipo;
 

@@ -35,7 +35,7 @@ public class UsuarioChat {
 
     @Column(nullable = false, columnDefinition = "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
-    private Instant  fechaUnion;
+    private Instant fechaUnion;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -39,8 +39,8 @@ public class ChatService {
 
     private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
 
-    public ChatResponse crear(ChatRequest chatRequest) {
-        Usuario creador = usuarioRepository.findById( chatRequest.getIdCreador() )
+    public ChatResponse crear(ChatRequest chatRequest, String usuario) {
+        Usuario creador = usuarioRepository.findByUsuario( usuario )
                 .orElseThrow(() -> new UsuarioNoEncontradoException());
 
         Chat chat = switch (chatRequest.getTipo()) {
@@ -69,6 +69,7 @@ public class ChatService {
 
     private Chat crearGrupo(String nombreGrupo, Usuario creador) {
         Chat chat = crearChatBase(TipoChat.GRUPO, creador, nombreGrupo);
+        logger.info("Se ha creado el grupo '{}' por el usuario con id '{}'", nombreGrupo, creador.getId());
 
         usuarioChatService.agregarUsuario(creador, chat, RolEnChat.ADMIN);
 
@@ -86,6 +87,8 @@ public class ChatService {
 
     private Chat crearConversacion(Usuario usr1, Usuario usr2) {
         Chat chat = crearChatBase(TipoChat.CONVERSACION, usr1);
+
+        logger.info("Se ha creado el la conversacion entre los usuarios con id '{}' y '{}'", usr1.getId(), usr2.getId());
 
         usuarioChatService.agregarUsuario(usr1, chat, RolEnChat.MIEMBRO);
         usuarioChatService.agregarUsuario(usr2, chat, RolEnChat.MIEMBRO);

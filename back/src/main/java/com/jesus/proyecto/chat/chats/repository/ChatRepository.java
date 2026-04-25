@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import com.jesus.proyecto.chat.chats.entity.Chat;
 import com.jesus.proyecto.chat.chats.utils.TipoChat;
-import com.jesus.proyecto.chat.usuarios.entity.Usuario;
 
 @Repository
 public interface ChatRepository extends JpaRepository<Chat, UUID> {
@@ -21,9 +20,9 @@ public interface ChatRepository extends JpaRepository<Chat, UUID> {
 
     Optional<Chat> findByIdAndTipo(UUID id, TipoChat tipo);
 
-    List<Usuario> findUsuariosByNombreContainingIgnoreCase(String nombre);
-
-    // busqueda con @query para buscar si una conversacion existe entre dos usuarios uniendo la tabla de chats con la tabla de relacionUsuarioChat y filtrando por el id de los usuarios
+    // busqueda con @query para buscar si una conversacion existe entre dos usuarios
+    // uniendo la tabla de chats con la tabla de relacionUsuarioChat y filtrando por
+    // el id de los usuarios
     @Query("""
         SELECT c FROM Chat c
             JOIN UsuarioChat uc ON uc.chat = c

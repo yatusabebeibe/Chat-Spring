@@ -7,6 +7,7 @@ import com.jesus.proyecto.chat.usuarios.entity.Usuario;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,10 +30,10 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 200)
+    @Column(nullable = false, unique = true, length = 400)
     private String token;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
@@ -40,5 +41,5 @@ public class RefreshToken {
     private Instant fechaExpiracion;
 
     @Column(nullable = false)
-    private boolean valido;
+    private boolean revocado = false;
 }

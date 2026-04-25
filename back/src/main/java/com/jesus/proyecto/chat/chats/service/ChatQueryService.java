@@ -12,7 +12,6 @@ import com.jesus.proyecto.chat.chats.utils.TipoChat;
 import com.jesus.proyecto.chat.mensajes.entity.Mensaje;
 import com.jesus.proyecto.chat.mensajes.mapper.MensajeMapper;
 import com.jesus.proyecto.chat.mensajes.repository.MensajeRepository;
-import com.jesus.proyecto.chat.relacionUsuarioChat.entity.UsuarioChat;
 import com.jesus.proyecto.chat.relacionUsuarioChat.repository.UsuarioChatRepository;
 
 import lombok.AllArgsConstructor;
@@ -41,12 +40,16 @@ public class ChatQueryService {
 
         return response;
     }
+    private ChatListResponse crearResponseUsuario(Chat chat, UUID usuarioId) {
+        ChatListResponse response = crearResponse(chat);
+        response.setNombre(chat.getNombreConversacionParaUsuario(usuarioId));
+        return response;
+    }
 
     public List<ChatListResponse> obtenerListaChatsUsuario(UUID idUsuario) {
-        List<UsuarioChat> participaciones = usuarioChatRepository.findById_IdUsuario(idUsuario);
-
-        return participaciones.stream()
-                .map(uChat -> crearResponse(uChat.getChat()))
+        return usuarioChatRepository.findParticipacionesConMiembros(idUsuario)
+                .stream()
+                .map(uc -> crearResponseUsuario(uc.getChat(), idUsuario))
                 .toList();
     }
 

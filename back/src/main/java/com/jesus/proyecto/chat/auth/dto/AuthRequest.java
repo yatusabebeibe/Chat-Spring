@@ -1,5 +1,6 @@
 package com.jesus.proyecto.chat.auth.dto;
 
+import com.jesus.proyecto.chat.auth.utils.AuthValidations;
 import com.jesus.proyecto.chat.usuarios.utils.UsuarioValidations;
 
 import jakarta.validation.constraints.NotBlank;
@@ -22,5 +23,10 @@ public class AuthRequest {
     private String usuario;
 
     @NotBlank(message = "La contraseña no puede estar vacía")
+    @Size(
+        min = AuthValidations.MIN_PASS_LENGTH,
+        max = AuthValidations.MAX_PASS_LENGTH,
+        message = AuthValidations.MSG_PASS_LENGTH
+    )
     private String password;
 }

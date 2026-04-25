@@ -20,6 +20,6 @@ public class AuthRequiredHandler implements AuthenticationEntryPoint {
         response.setStatus(401);
         response.setContentType("application/json");
 
-        response.getWriter().write("{\"error\": \"no esta autenticado\"}");
+        response.getWriter().write("{\"error\": \"Necesitas autenticarte\"}");
     }
 }

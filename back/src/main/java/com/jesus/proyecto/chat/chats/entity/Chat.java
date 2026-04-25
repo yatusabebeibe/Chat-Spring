@@ -65,4 +65,19 @@ public class Chat {
 
     @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY)
     private List<Mensaje> mensajes;
+
+    public String getNombreConversacionParaUsuario(UUID idUsuario) {
+        if (this.tipo != TipoChat.CONVERSACION) {
+            return this.nombre;
+        }
+
+        for (UsuarioChat uc : this.miembros) {
+            Usuario u = uc.getUsuario();
+            if (!u.getId().equals(idUsuario)) {
+                return u.getNombre();
+            }
+        }
+
+        return this.nombre;
+    }
 }

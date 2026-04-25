@@ -10,4 +10,8 @@ public class UsuarioRequest {
     private UUID id;
 
     private String usuario;
+
+    private String nombre;
+
+    private String buscar;
 }

@@ -30,7 +30,6 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomUserDetailsService userDetailsService;
-    
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -44,11 +43,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints - no auth required
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/").permitAll()
-                .requestMatchers("/app/login", "/app/registro").permitAll()
                 // Everything else requires authentication
                 .anyRequest().authenticated()
             )
+            // .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
 
             // Stateless session - no server-side session storage
             .sessionManagement(session -> session

@@ -8,17 +8,14 @@ import com.jesus.proyecto.chat.auth.repository.RefreshTokenRepository;
 import com.jesus.proyecto.chat.usuarios.entity.Usuario;
 import com.jesus.proyecto.chat.usuarios.repository.UsuarioRepository;
 
+import lombok.AllArgsConstructor;
+
 @Service
+@AllArgsConstructor
 public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final UsuarioRepository usuarioRepository;
-
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, 
-                                UsuarioRepository usuarioRepository) {
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.usuarioRepository = usuarioRepository;
-    }
 
     @Transactional
     public void revocarRefreshdTodosUsuarios(String username) {
@@ -29,7 +26,7 @@ public class RefreshTokenService {
             .orElse(null);
             
         if (token != null) {
-            token.setValido(false);
+            token.setRevocado(true);
             refreshTokenRepository.save(token);
         }
     }

@@ -3,16 +3,18 @@ package com.jesus.proyecto.chat.auth.service;
 import java.time.Instant;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jesus.proyecto.chat._general.config.JwtConfig;
 import com.jesus.proyecto.chat._general.config.SecurityConfig;
-import com.jesus.proyecto.chat._general.exceptions.AuthException;
+import com.jesus.proyecto.chat._general.exceptions.MyAuthException;
 import com.jesus.proyecto.chat.auth.dto.AuthRequest;
 import com.jesus.proyecto.chat.auth.dto.AuthResponse;
 import com.jesus.proyecto.chat.auth.dto.RegistroRequest;
@@ -22,6 +24,7 @@ import com.jesus.proyecto.chat.usuarios.entity.Usuario;
 import com.jesus.proyecto.chat.usuarios.repository.UsuarioRepository;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
@@ -37,150 +40,178 @@ public class AuthService {
     private final SecurityConfig securityConfig;
     private final JwtConfig jwtConfig;
 
-
-    // Registrar nuevo usuario
     @Transactional
     public AuthResponse registrar(RegistroRequest request, HttpServletResponse response) {
         if (usuarioRepository.existsByUsuario(request.getUsuario())) {
-            throw new AuthException(Map.of("error", "El usuario ya existe"));
+            throw new MyAuthException(Map.of("error", "El usuario ya existe"));
         }
 
         Usuario usuario = new Usuario();
         usuario.setUsuario(request.getUsuario());
         usuario.setNombre(request.getNombre());
         usuario.setPassword(securityConfig.passwordEncoder().encode(request.getPassword()));
-        
+
         Usuario guardado = usuarioRepository.save(usuario);
 
-        UserDetails userDetails = userDetailsService.loadUserById(guardado.getId());
-        String accessToken = jwtService.generarAccessToken(userDetails);
-        String refreshToken = jwtService.generarRefreshToken(userDetails);
+        generarTokensYCookies(guardado, response);
 
-        RefreshToken token = new RefreshToken();
-        token.setToken(refreshToken);
-        token.setFechaExpiracion(Instant.now().plusMillis(jwtConfig.getRefreshExpiration()));
-        token.setUsuario(usuario);
-        token.setValido(true);
-        refreshTokenRepository.save(token);
-
-        AuthResponse authResp = new AuthResponse();
-        authResp.setId(usuario.getId());
-        authResp.setUsuario(usuario.getUsuario());
-        authResp.setNombre(usuario.getNombre());
-        authResp.setAccessToken(accessToken);
-        authResp.setRefreshToken(refreshToken);
-
-        response.addCookie(generarAccessCookie(accessToken));
-        response.addCookie(generarRefreshCookie(refreshToken));
-
-        return authResp;
+        return crearResponse(guardado);
     }
 
-    // Login completo (genera tokens)
     @Transactional
     public AuthResponse autenticar(AuthRequest request, HttpServletResponse response) {
 
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getUsuario(), request.getPassword())
-        );
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsuario(),
+                            request.getPassword()));
+        } catch (AuthenticationException e) {
+            throw new MyAuthException("Usuario o password incorrectos");
+        }
 
-        // Obtener detalles del usuario
-        UserDetails userDetails = userDetailsService.loadUserByUsername(authentication.getName());
-
-        // Generar tokens con UserDetails en lugar de String
-        String accessToken = jwtService.generarAccessToken(userDetails);
-
-        String refreshToken = jwtService.generarRefreshToken(userDetails);
-        
-        RefreshToken token = new RefreshToken();
-        token.setToken(refreshToken);
-        token.setFechaExpiracion(Instant.now().plusMillis(jwtConfig.getRefreshExpiration()));
-        
         Usuario usuario = usuarioRepository.findByUsuario(authentication.getName())
-            .orElseThrow(() -> new AuthException("Usuario no encontrado"));
-        
-        token.setUsuario(usuario);
-        token.setValido(true);
-        refreshTokenRepository.save(token);
+                .orElseThrow(() -> new MyAuthException("Usuario no encontrado"));
 
-        AuthResponse authResp = new AuthResponse();
-        authResp.setId(usuario.getId());
-        authResp.setUsuario(usuario.getUsuario());
-        authResp.setNombre(usuario.getNombre());
-        authResp.setAccessToken(accessToken);
-        authResp.setRefreshToken(token.getToken());
+        generarTokensYCookies(usuario, response);
 
-        response.addCookie(generarAccessCookie(accessToken));
-        response.addCookie(generarRefreshCookie(token.getToken()));
-
-        return authResp;
+        return crearResponse(usuario);
     }
 
+    private void generarTokensYCookies(Usuario usuario, HttpServletResponse response) {
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getUsuario());
+
+        Map<String, Object> claims =  Map.of("userId", usuario.getId()) ;
+
+        String accessToken = jwtService.generarAccessToken(userDetails, claims);
+        String refreshToken = jwtService.generarRefreshToken(userDetails,claims);
+
+        guardarRefreshToken(refreshToken, usuario);
+
+        response.addCookie(generarAccessCookie(accessToken));
+        response.addCookie(generarRefreshCookie(refreshToken));
+    }
 
     @Transactional
-    public AuthResponse refrescarAccessToken(String refreshTokenJwt, String username) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenJwt)
-                .orElseThrow(() -> new AuthException("Refresh token inválido"));
+    public ResponseEntity<?> refrescarAccessToken(HttpServletRequest request, HttpServletResponse response) {
 
-        if (!refreshToken.isValido()) {
-            throw new AuthException("Refresh token revocado");
-        }
+        String refreshTokenJwt = extraerRefreshToken(request);
 
-        // Verificar expiración
-        if (Instant.now().isAfter(refreshToken.getFechaExpiracion())) {
-            refreshToken.setValido(false);
-            refreshTokenRepository.save(refreshToken);
-            throw new AuthException("Refresh token expirado");
-        }
-
-        // Generar nuevo access y refresh tokens
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        String accessToken = jwtService.generarAccessToken(userDetails);
-        String newRefreshToken = jwtService.generarRefreshToken(userDetails);
-
-        RefreshToken nuevoRefresh = new RefreshToken();
-        nuevoRefresh.setUsuario(refreshToken.getUsuario());
-        nuevoRefresh.setToken(newRefreshToken);
-        nuevoRefresh.setFechaExpiracion(Instant.now().plusMillis(jwtConfig.getRefreshExpiration()));
-        nuevoRefresh.setValido(true);
-        
-        refreshTokenRepository.save(nuevoRefresh);
+        RefreshToken refreshToken = validarRefreshToken(refreshTokenJwt);
 
         Usuario usuario = refreshToken.getUsuario();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getUsuario());
 
-        AuthResponse authResp = new AuthResponse();
-        authResp.setId(usuario.getId());
-        authResp.setUsuario(usuario.getUsuario());
-        authResp.setNombre(usuario.getNombre());
-        authResp.setAccessToken(accessToken);
-        authResp.setRefreshToken(newRefreshToken);
-        return authResp;
+        String token = jwtService.generarAccessToken(userDetails, Map.of("userId", usuario.getId()) );
+
+        response.addCookie(generarAccessCookie(token));
+
+        rotarRefreshSiEsNecesario(refreshToken, usuario, userDetails, response);
+
+        return ResponseEntity.ok().build();
+    }
+
+    private String extraerRefreshToken(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            throw new MyAuthException("Refresh token no encontrado");
+        }
+
+        for (Cookie cookie : request.getCookies()) {
+            if ("refreshToken".equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+
+        throw new MyAuthException("Refresh token no encontrado");
+    }
+
+    private RefreshToken validarRefreshToken(String tokenJwt) {
+
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(tokenJwt)
+                .orElseThrow(() -> new MyAuthException("Refresh token invalido"));
+
+        if (!refreshToken.isRevocado()) {
+            throw new MyAuthException("Refresh token revocado");
+        }
+
+        if (Instant.now().isAfter(refreshToken.getFechaExpiracion())) {
+            refreshToken.setRevocado(true);
+            refreshTokenRepository.save(refreshToken);
+            throw new MyAuthException("Refresh token expirado");
+        }
+
+        return refreshToken;
+    }
+
+    private void rotarRefreshSiEsNecesario(
+            RefreshToken refreshToken,
+            Usuario usuario,
+            UserDetails userDetails,
+            HttpServletResponse response
+    ) {
+        long tiempoRestante = refreshToken.getFechaExpiracion().toEpochMilli()
+                - Instant.now().toEpochMilli();
+
+        if (tiempoRestante >= jwtConfig.getRefreshRotation()) {
+            return;
+        }
+
+        refreshToken.setRevocado(true);
+        refreshTokenRepository.save(refreshToken);
+
+        Map<String, Object> claims =  Map.of("userId", usuario.getId()) ;
+
+        String newRefreshToken = jwtService.generarRefreshToken(userDetails,claims);
+
+        guardarRefreshToken(newRefreshToken, usuario);
+
+        response.addCookie(generarRefreshCookie(newRefreshToken));
+    }
+
+    private void guardarRefreshToken(String token, Usuario usuario) {
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setToken(token);
+        refreshToken.setUsuario(usuario);
+        refreshToken.setRevocado(true);
+        refreshToken.setFechaExpiracion(
+                Instant.now().plusMillis(jwtConfig.getRefreshExpiration()));
+        refreshTokenRepository.save(refreshToken);
+    }
+
+    private AuthResponse crearResponse(Usuario usuario) {
+        AuthResponse resp = new AuthResponse();
+        resp.setId(usuario.getId());
+        resp.setUsuario(usuario.getUsuario());
+        resp.setNombre(usuario.getNombre());
+        return resp;
     }
 
     private Cookie generarAccessCookie(String token) {
-        return generearCookie("accessToken", token, jwtConfig.getAccessExpiration());
-    }
-    private Cookie generarRefreshCookie(String token) {
-        return generearCookie("refreshToken", token, jwtConfig.getAccessExpiration());
+        return generarCookie("accessToken", token, jwtConfig.getAccessExpiration());
     }
 
-    private Cookie generearCookie(String tipo, String token, long edad) {
-        Cookie cookie = new Cookie(tipo, token);
+    private Cookie generarRefreshCookie(String token) {
+        return generarCookie("refreshToken", token, jwtConfig.getRefreshExpiration());
+    }
+
+    private Cookie generarCookie(String nombre, String token, long edad) {
+        Cookie cookie = new Cookie(nombre, token);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
-        cookie.setMaxAge((int)(edad / 1000));
         cookie.setPath("/");
-        // cookie.setAttribute("SameSite", "None");
+        cookie.setMaxAge((int) (edad / 1000));
         return cookie;
     }
 
     public void limpiarCookies(HttpServletResponse response) {
-        Cookie accessCookie = generarAccessCookie("");
-        accessCookie.setMaxAge(0); // Expirar inmediatamente
-        response.addCookie(accessCookie);
-        
-        Cookie refreshCookie = generarRefreshCookie("");
-        refreshCookie.setMaxAge(0); // Expirar inmediatamente
-        response.addCookie(refreshCookie);
+        Cookie access = generarAccessCookie("");
+        access.setMaxAge(0);
+        response.addCookie(access);
+
+        Cookie refresh = generarRefreshCookie("");
+        refresh.setMaxAge(0);
+        response.addCookie(refresh);
     }
 }

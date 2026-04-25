@@ -17,10 +17,15 @@ public class JwtConfig {
     @Value("${jwt.refresh.expiration}")
     private String refreshExpirationStr;
 
+    @Value("${jwt.refresh.rotation}")
+    private String refreshRotationStr;
+
     @Getter
     private long accessExpiration = parseAccessDuration();
     @Getter
     private long refreshExpiration = parseRefreshDuration();
+    @Getter
+    private long refreshRotation = parseRefreshRotation();
 
 
     public String getSecretKey() {
@@ -45,6 +50,13 @@ public class JwtConfig {
             return parseDuration(refreshExpirationStr);
         } catch (Exception e) {
             return (long)(7 * 24 * 60 * 60 * 1000L); // fallback: 7 days
+        }
+    }
+    private long parseRefreshRotation() {
+        try {
+            return parseDuration(refreshRotationStr);
+        } catch (Exception e) {
+            return (long)(3 * 24 * 60 * 60 * 1000L); // fallback: 3 dias
         }
     }
 

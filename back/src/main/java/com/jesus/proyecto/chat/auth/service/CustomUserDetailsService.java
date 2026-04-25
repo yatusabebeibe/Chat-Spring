@@ -39,7 +39,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private UserDetails cargarUserDetails(Usuario usuario) {
-        // Roles simples: MIEMBRO o ADMIN (si estuviera en base de datos)
         List<GrantedAuthority> authorities = List.of(
             new SimpleGrantedAuthority("ROLE_MEMBER") // Default
         );

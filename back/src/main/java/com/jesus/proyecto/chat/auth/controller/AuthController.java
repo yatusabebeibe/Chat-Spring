@@ -11,6 +11,7 @@ import com.jesus.proyecto.chat.auth.dto.AuthResponse;
 import com.jesus.proyecto.chat.auth.dto.RegistroRequest;
 import com.jesus.proyecto.chat.auth.service.AuthService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -36,5 +37,10 @@ public class AuthController {
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         authService.limpiarCookies(response);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
+        return authService.refrescarAccessToken(request, response);
     }
 }

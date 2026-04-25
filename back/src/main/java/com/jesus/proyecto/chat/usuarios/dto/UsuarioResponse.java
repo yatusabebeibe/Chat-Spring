@@ -11,6 +11,4 @@ public class UsuarioResponse {
     private String usuario;
 
     private String nombre;
-
-    private String avatar;
 }

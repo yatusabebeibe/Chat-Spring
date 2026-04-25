@@ -1,23 +1,24 @@
 package com.jesus.proyecto.chat._general.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+
+import com.jesus.proyecto.chat._general.handler.ChatWebSocketHandler;
+
+import lombok.AllArgsConstructor;
 
 @Configuration
-@EnableWebSocketMessageBroker
-public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
+@EnableWebSocket
+@AllArgsConstructor
+public class WebSocketConfiguration implements WebSocketConfigurer {
+
+    private final ChatWebSocketHandler chatWebSocketHandler;
 
     @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
-    }
-
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.setApplicationDestinationPrefixes("/enviar"); // lo que envia el cliente
-		registry.enableSimpleBroker("/recibir"); // Lo que recibe el cliente
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(chatWebSocketHandler, "/ws")
+                .setAllowedOriginPatterns("*");
     }
 }

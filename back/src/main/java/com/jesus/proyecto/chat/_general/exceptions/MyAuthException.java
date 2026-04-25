@@ -2,17 +2,17 @@ package com.jesus.proyecto.chat._general.exceptions;
 
 import java.util.Map;
 
-public class AuthException extends AC_CustomException {
+public class MyAuthException extends AC_CustomException {
 
-    public AuthException() {
+    public MyAuthException() {
         super("Autenticación incorrecta",401);
     }
 
-    public AuthException(String mensaje) {
+    public MyAuthException(String mensaje) {
         super(mensaje,401);
     }
 
-    public AuthException(Map<String, String> detalles) {
+    public MyAuthException(Map<String, String> detalles) {
         super("",401);
         setDetalles(detalles);
     }

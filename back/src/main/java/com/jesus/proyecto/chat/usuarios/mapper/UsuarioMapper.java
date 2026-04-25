@@ -18,13 +18,11 @@ public interface UsuarioMapper {
     @Mapping(target = "fechaCreacion", ignore = true)
     @Mapping(target = "fechaUltimaConexion", ignore = true)
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "avatar", ignore = true)
     Usuario toEntity(UsuarioRequest response);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "chats", ignore = true)
     @Mapping(target = "fechaCreacion", ignore = true)
     @Mapping(target = "fechaUltimaConexion", ignore = true)
-    @Mapping(target = "avatar", ignore = true)
     Usuario toEntity(RegistroRequest request);
 }

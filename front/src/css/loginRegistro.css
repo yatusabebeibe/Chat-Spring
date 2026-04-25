@@ -1,0 +1,31 @@
+@media (max-width: 499px) {
+  main>div>form {
+    background: var(--colorPrincipal);
+    padding: 20px 5px;
+    border-radius: var(--radio);
+  }
+}
+form > * {
+  max-width: 300px;
+  width: 100%;
+}
+form {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  gap: 28px;
+}
+
+input[type="submit"], button[type="submit"] {
+  margin-top: 20px;
+  padding: 8px;
+  border-radius: calc(var(--radio) / 3);
+  border: none;
+  cursor: pointer;
+
+  transition: all .2s ease;
+}
+
+input[type="submit"]:hover, button[type="submit"]:hover {
+  box-shadow: 3px 4px 1px black;
+}

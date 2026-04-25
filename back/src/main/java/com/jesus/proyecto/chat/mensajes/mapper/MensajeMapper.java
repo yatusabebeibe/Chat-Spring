@@ -16,7 +16,7 @@ public interface MensajeMapper {
     @Mapping(target = "eliminado", ignore = true)
 
     @Mapping(target = "chat.id", source = "chatId")
-    @Mapping(target = "usuario.id", source = "usuarioId")
+    @Mapping(target = "usuario.id", ignore = true)
     @Mapping(target = "mensajeRespuesta.id", ignore = true /* source = "mensajeRespuestaId" */)
     Mensaje toEntity(MensajeRequest request);
 

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.jesus.proyecto.chat._general.utils.CookieUtils;
-import com.jesus.proyecto.chat.auth.service.JwtService;
 import com.jesus.proyecto.chat.auth.service.CustomUserDetailsService;
+import com.jesus.proyecto.chat.auth.service.JwtService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,6 +25,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/api/auth/");
+    }
 
     @Override
     protected void doFilterInternal(
