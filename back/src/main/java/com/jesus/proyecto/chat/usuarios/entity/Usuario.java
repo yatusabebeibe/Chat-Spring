@@ -18,14 +18,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+@Data
 @Entity
 @Table(name = "usuarios")
-@Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Usuario {
 

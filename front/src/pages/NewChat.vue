@@ -20,26 +20,42 @@
 
     <!-- Si es conversacion -->
     <div v-if="tipoChat === 'conversacion'">
-      <Inputs
-        v-model="usuario"
-        texto="¿Con que usuario?"
-        name="usuario"
-        tipo="text"
-        autocomplete="off"
-        :errorMsg="errorUsuario"
-      />
 
-      <!-- lista sugerencias -->
-      <ul v-if="usuariosEncontrados.length">
-        <li
-          v-for="u in usuariosEncontrados"
-          :key="u.id"
-          @click="seleccionarUsuario(u)"
-          style="cursor:pointer"
-        >
-          {{ u.nombre }} (@{{ u.usuario }})
-        </li>
-      </ul>
+      <!-- INPUT solo si NO hay usuario seleccionado -->
+      <div v-if="!usuarioSeleccionado">
+        <Inputs
+          v-model="usuario"
+          texto="¿Con que usuario?"
+          name="usuario"
+          tipo="text"
+          autocomplete="off"
+          :errorMsg="errorUsuario"
+        />
+
+        <!-- lista sugerencias -->
+        <ul v-if="usuariosEncontrados.length">
+          <li
+            v-for="u in usuariosEncontrados"
+            :key="u.id"
+            @click="seleccionarUsuario(u)"
+            style="cursor:pointer"
+          >
+            {{ u.nombre }} (@{{ u.usuario }})
+          </li>
+        </ul>
+      </div>
+
+      <!-- USUARIO SELECCIONADO -->
+      <div v-else style="display:flex; align-items:center; gap:8px; position: relative;">
+        <span>
+          {{ usuarioSeleccionado.nombre }} (@{{ usuarioSeleccionado.usuario }})
+        </span>
+
+        <button type="button" @click="deseleccionarUsuario">X</button>
+        <span v-if="errorUsuario && usuarioSeleccionado" class="error">
+          {{ errorUsuario }}
+        </span>
+      </div>
     </div>
 
     <button v-if="tipoChat !== ''" type="submit">Crear</button>
@@ -63,6 +79,7 @@ const errorNombreGrupo = ref('')
 const errorUsuario = ref('')
 
 watch(usuario, async (buscado) => {
+  errorUsuario.value = ''
   if (!buscado) {
     usuariosEncontrados.value = []
     return
@@ -73,10 +90,15 @@ watch(usuario, async (buscado) => {
   usuariosEncontrados.value = req.data
 })
 
-function seleccionarUsuario(u) {
+const seleccionarUsuario = (u) => {
   usuario.value = u.usuario
   usuarioSeleccionado.value = u
   usuariosEncontrados.value = []
+}
+const deseleccionarUsuario = () => {
+  usuarioSeleccionado.value = null
+  usuario.value = ''
+  errorUsuario.value = ''
 }
 
 async function handleSubmit() {
@@ -112,11 +134,11 @@ async function handleSubmit() {
 
   const res = await apiFetch("/chat", payload, "POST")
 
-  // ejemplo por si backend devuelve error
   if (!res.ok) {
     console.log(res);
     
     if (res.data?.error.nombre) {errorNombreGrupo.value = res.data?.error.nombre}
+    if (res.data?.error.conversacion) {errorUsuario.value = res.data?.error.conversacion}
     return
   }
 

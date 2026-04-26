@@ -34,7 +34,7 @@ public class ChatQueryService {
         response.setId(chat.getId());
         response.setNombre(chat.getNombre());
         response.setTipo(chat.getTipo());
-        response.setUltimoMensaje(mensajeMapper.toResponse(ultimo));
+        response.setUltimoMensaje(mensajeMapper.toResponseSinArchivos(ultimo));
         response.setIdCreador(chat.getCreador().getId());
         response.setFechaCreacion(chat.getFechaCreacion());
 

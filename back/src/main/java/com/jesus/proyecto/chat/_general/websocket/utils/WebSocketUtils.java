@@ -5,12 +5,11 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 import com.jesus.proyecto.chat._general.ai.service.AIService;
-import com.jesus.proyecto.chat.mensajes.dto.MensajeRequest;
+import com.jesus.proyecto.chat.mensajes.dto.CrearMensajeRequest;
 import com.jesus.proyecto.chat.mensajes.dto.SessionMessageState;
 import com.jesus.proyecto.chat.mensajes.utils.TipoMensaje;
 
 import lombok.RequiredArgsConstructor;
-import lombok.var;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class WebSocketUtils {
     private final AIService aiService;
 
 
-    private List<String> obtenerExtensiones(MensajeRequest req) {
+    private List<String> obtenerExtensiones(CrearMensajeRequest req) {
         if (req.getArchivos() == null) return List.of();
 
         return req.getArchivos().stream()

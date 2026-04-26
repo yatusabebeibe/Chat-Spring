@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,19 +13,14 @@ import com.jesus.proyecto.chat.mensajes.entity.Mensaje;
 @Repository
 public interface MensajeRepository extends JpaRepository<Mensaje, UUID> {
 
-    Optional<Mensaje> findById(UUID id);
-
     List<Mensaje> findByChatId(UUID chatId);
 
     List<Mensaje> findByUsuarioId(UUID usuarioId);
 
-    List<Mensaje> findByChatIdOrderByFechaEnvioDesc(UUID chatId);
-
-    List<Mensaje> findByChatIdAndEliminadoFalseOrderByFechaEnvioDesc(UUID chatId);
-
     Optional<Mensaje> findFirstByChatIdAndEliminadoFalseOrderByFechaEnvioDesc(UUID chatId);
 
-    List<Mensaje> findTop25ByChatIdAndEliminadoFalseOrderByIdDesc(UUID chatId); // obtien lista de los 25 ultimos mensajes
-    List<Mensaje> findTop25ByChatIdAndEliminadoFalseAndIdLessThanOrderByIdDesc(UUID chatId, UUID msgId); // ^ a partir de X msg
+    List<Mensaje> findByChatIdAndEliminadoFalse(UUID chatId, Pageable pageable); // obtien lista de los X ultimos mensajes
+    List<Mensaje> findByChatIdAndEliminadoFalseAndIdLessThanOrderByIdDesc(UUID chatId, UUID msgId, Pageable pageable); // ^ posteriores a X msg
+    List<Mensaje> findByChatIdAndEliminadoFalseAndIdGreaterThanOrderByIdAsc(UUID chatId, UUID msgId, Pageable pageable); // ^ anteriores a X msg
 
 }

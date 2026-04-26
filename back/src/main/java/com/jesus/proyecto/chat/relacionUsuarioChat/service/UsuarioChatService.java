@@ -59,8 +59,13 @@ public class UsuarioChatService {
         agregarUsuario(usuario, chat, RolEnChat.MIEMBRO);
     }
 
-    public boolean usuarioEstaEnGrupo(UUID chatId, UUID usuarioId) {      
+    public boolean usuarioEstaEnGrupo(UUID chatId, UUID usuarioId) {
         if (chatId == null || usuarioId == null) {
+            System.out.println();
+            System.out.println("chatId="+chatId);
+            System.out.println("usuarioId="+usuarioId);
+            System.out.println();
+            System.out.println();
             return false;
         }
         return usuarioChatRepository.existsById_IdUsuarioAndId_IdChat(usuarioId, chatId);

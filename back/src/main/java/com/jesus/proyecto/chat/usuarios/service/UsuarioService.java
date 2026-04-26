@@ -3,6 +3,7 @@ package com.jesus.proyecto.chat.usuarios.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,13 @@ public class UsuarioService {
                 .toList();
     }
 
+    public List<UsuarioResponse> obtenerTodos(Pageable pageable) {
+        return usuarioRepository.findAll(pageable)
+                .stream()
+                .map(u -> usuarioMapper.toResponse(u))
+                .toList();
+    }
+
     public Usuario buscarUnico(UUID id, String usuario) {
 
         if (id != null) {
@@ -58,17 +66,16 @@ public class UsuarioService {
                 .orElse(null);
     }
 
-    public List<Usuario> listarPorUsuarioYNombre(String texto) {
+    public List<Usuario> listarPorUsuarioYNombre(String texto, Pageable pageable) {
         return usuarioRepository
-                // .searchByUsuarioContainingIgnoreCaseOrNombreContainingIgnoreCase(texto, texto)
-                .findUsuariosPorNombreOUsuario(texto)
+                .findUsuariosPorNombreOUsuario(texto, pageable)
                 .stream()
                 .toList();
     }
 
-    public List<UsuarioResponse> listarPorUsuarioYNombreResponse(String texto) {
+    public List<UsuarioResponse> listarPorUsuarioYNombreResponse(String texto, Pageable pageable) {
         return usuarioRepository
-                .findUsuariosPorNombreOUsuario(texto)
+                .findUsuariosPorNombreOUsuario(texto, pageable)
                 .stream()
                 .map(usuarioMapper::toResponse)
                 .toList();

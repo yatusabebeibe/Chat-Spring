@@ -1,34 +1,23 @@
 package com.jesus.proyecto.chat.mensajes.dto;
 
-import java.util.List;
 import java.util.UUID;
 
-import com.jesus.proyecto.chat.archivoMensaje.dto.ArchivoRequest;
-import com.jesus.proyecto.chat.mensajes.utils.TipoMensaje;
+import com.jesus.proyecto.chat.mensajes.utils.SentidoMensaje;
 
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Getter
+@Data
+@AllArgsConstructor
 public class MensajeRequest {
 
-    @NotNull(message = "El chat es obligatorio")
+    @NotNull(message = "Es obligatorio introducir un chatId")
     private UUID chatId;
 
-    @Size(max = 2000, message = "El mensaje es demasiado largo")
-    private String mensaje;
+    UUID msgId;
 
+    private Integer limite;
 
-    // Lo completo yo
-    @Setter
-    private TipoMensaje tipo;
-
-
-    // opcionales
-
-    private UUID mensajeRespuestaId;
-
-    private List<ArchivoRequest> archivos;
+    private SentidoMensaje sentido;
 }

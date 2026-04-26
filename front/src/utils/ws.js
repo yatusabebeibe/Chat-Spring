@@ -1,4 +1,4 @@
-import { mergeChats } from "./chat.js"
+import { actualizarChatUltimoMensaje, añadirMensajesFinal, listaChats, mergeChats } from "./chat.js"
 import { ref } from "vue"
 
 export const socket = ref(null)
@@ -19,5 +19,20 @@ export const conectarSocket = () => {
         detail: data
       }))
     }
+    if (data.type === "NEW_MESSAGE") {
+      window.dispatchEvent(new CustomEvent("ws-new-message", {
+        detail: data.message
+      }))
+    }
+
   }
 }
+
+
+
+
+addEventListener("ws-new-message", async (e) => {
+  console.log(e.detail);
+  añadirMensajesFinal([e.detail])
+  actualizarChatUltimoMensaje(e.detail)
+})

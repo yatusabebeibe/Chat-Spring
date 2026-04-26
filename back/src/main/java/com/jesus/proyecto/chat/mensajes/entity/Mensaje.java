@@ -23,14 +23,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.ToString;
 
+@Data
 @Entity
 @Table(name = "mensajes")
-@Getter
-@Setter
+@ToString(exclude = {"usuario", "chat"})
 @NoArgsConstructor
 public class Mensaje {
 

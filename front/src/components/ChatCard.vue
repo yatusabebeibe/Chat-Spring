@@ -12,7 +12,7 @@
     <div>
       <h3>{{ props.titulo }}</h3>
       <span>{{ formatearFecha(props.fechaUltimoMsg) }}</span>
-      <p>{{ props.msg }}</p>
+      <p>{{ props.msg.trim().length > 1 ? props.msg : "/* vacio */" }}</p>
     </div>
   </RouterLink>
 </template>
@@ -23,7 +23,7 @@
 import { computed, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 
-const props = defineProps({
+const props =  defineProps({
   fechaUltimoMsg: { type: String, required: true },
   chatId: { type: String, required: true },
   titulo: { type: String, required: true },

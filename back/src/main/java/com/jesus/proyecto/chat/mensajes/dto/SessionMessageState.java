@@ -5,11 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Data
 public class SessionMessageState {
 
@@ -19,9 +15,11 @@ public class SessionMessageState {
 
     private UUID chatId;
 
-    private MensajeRequest request;
+    private CrearMensajeRequest request;
 
     private Map<Integer, byte[]> archivos = new ConcurrentHashMap<>();
+
+    private Map<Integer, String> rutasArchivos;
 
     private int expectedFiles;
 

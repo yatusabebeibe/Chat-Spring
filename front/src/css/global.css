@@ -45,6 +45,8 @@ body { display: flex; flex-flow: column-reverse; }
 body > main {
   width: 100%;
   height: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 body > header {
@@ -98,4 +100,14 @@ body > header > * { height: 100%; }
     height: 100%; width: 100%;
     flex-direction: column;
   }
+}
+
+span.error {
+  position: absolute;
+  top: 100%;
+  display: block;
+  width: 100%;
+  color: rgb(255, 128, 128);
+  font-weight: bolder;
+  font-size: .7rem;
 }

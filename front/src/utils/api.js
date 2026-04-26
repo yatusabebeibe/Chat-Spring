@@ -1,9 +1,6 @@
+import { chatConfig } from "@/config.js"
 import router from "@/router/index.js"
-import { mergeChats } from '@/utils/chat.js'
-import { computed, ref } from "vue"
-
-
-export const chatsMap = ref(new Map())
+import { añadirMensajesFinal, añadirMensajesPrincipio, listaMensajesChatActual, mergeChats } from '@/utils/chat.js'
 
 
 // funcion base sin logica de retry
@@ -67,10 +64,16 @@ export const cargarChats = async () => {
     return
   }
 
-  mergeChats(chatsMap.value, res.data)
+  mergeChats(res.data)
 }
 
-export const listaChats = computed(() => {
-  return Array.from(chatsMap.value.values())
-    .sort((a, b) => obtenerFechaChats(b) - obtenerFechaChats(a))
-})
+export const cargarMensajesChats = async (chatId) => {
+  const res = await apiFetch(`/msg?chatId=${chatId}&limite=${chatConfig.MAX_MENSAJES.value}`)
+
+  if (!res.ok) {
+    console.error('Error cargando mensajes', res.data)
+    return
+  }
+
+  listaMensajesChatActual.value = res.data;
+}

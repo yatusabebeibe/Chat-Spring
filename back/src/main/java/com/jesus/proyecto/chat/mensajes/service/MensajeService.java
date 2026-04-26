@@ -3,13 +3,19 @@ package com.jesus.proyecto.chat.mensajes.service;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.jesus.proyecto.chat._general.exceptions.DatosRequeridosException;
+import com.jesus.proyecto.chat._general.utils.Paginacion;
+import com.jesus.proyecto.chat.mensajes.dto.MensajeRequest;
 import com.jesus.proyecto.chat.mensajes.dto.MensajeResponse;
 import com.jesus.proyecto.chat.mensajes.entity.Mensaje;
 import com.jesus.proyecto.chat.mensajes.mapper.MensajeMapper;
 import com.jesus.proyecto.chat.mensajes.repository.MensajeRepository;
+import com.jesus.proyecto.chat.mensajes.utils.SentidoMensaje;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -26,21 +32,54 @@ public class MensajeService {
         return mensajeRepository.save(mensaje);
     }
 
-    public List<MensajeResponse> obtenerMensajesChat(UUID chatId, UUID msgId) {
-        if (chatId == null) throw new DatosRequeridosException();
+    public List<MensajeResponse> obtenerMensajesChat(MensajeRequest req) {
+        if (req.getChatId() == null) throw new DatosRequeridosException();
+
+        System.out.println("---------------");
+
+        int limite = Paginacion.validarLimite(req.getLimite());
 
         List<Mensaje> mensajes;
 
-        if (msgId == null) { 
-            // obtiene los ultimos 25 mensajes del chat
-            mensajes = mensajeRepository.findTop25ByChatIdAndEliminadoFalseOrderByIdDesc(chatId);
+        if (req.getMsgId() == null) {
+            mensajes = getInitial(req.getChatId(), limite);
         } else {
-            // obtiene los ultimos 25 mensajes del chat a partir de X msg
-            mensajes = mensajeRepository.findTop25ByChatIdAndEliminadoFalseAndIdLessThanOrderByIdDesc(chatId, msgId);
+            if (req.getSentido() == SentidoMensaje.ANT) {
+                mensajes = getOlder(req.getChatId(), req.getMsgId(), limite);
+            } else {
+                mensajes = getNewer(req.getChatId(), req.getMsgId(), limite);
+            }
         }
 
+        System.out.println(mensajes.toString());
+        System.out.println("---------------");
+
         return mensajes.stream()
-                .map(msg -> mensajeMapper.toResponse(msg))
+                .map(mensajeMapper::toResponse)
                 .toList();
+    }
+
+    public List<Mensaje> getInitial(UUID chatId, int size) {
+        Sort orden = Sort.by(Direction.ASC, "id");
+        return mensajeRepository.findByChatIdAndEliminadoFalse(
+            chatId,
+            PageRequest.of(0, size, orden)
+        );
+    }
+
+    public List<Mensaje> getOlder(UUID chatId, UUID cursor, int size) {
+        return mensajeRepository.findByChatIdAndEliminadoFalseAndIdLessThanOrderByIdDesc(
+            chatId,
+            cursor,
+            PageRequest.of(0, size)
+        );
+    }
+
+    public List<Mensaje> getNewer(UUID chatId, UUID cursor, int size) {
+        return mensajeRepository.findByChatIdAndEliminadoFalseAndIdGreaterThanOrderByIdAsc(
+            chatId,
+            cursor,
+            PageRequest.of(0, size)
+        );
     }
 }

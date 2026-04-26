@@ -11,9 +11,10 @@
 </template>
 
 <script setup>
-import { cargarChats, listaChats } from '@/utils/api.js'
+import { cargarChats } from '@/utils/api.js'
+import { listaChats } from '@/utils/chat.js'
 import { conectarSocket } from '@/utils/ws.js'
-import { onMounted, onUnmounted } from 'vue'
+import { onBeforeMount, onBeforeUnmount } from 'vue'
 import ChatCard from './ChatCard.vue'
 
 let listarIntervalo
@@ -23,17 +24,14 @@ const formatearMensaje = (msg) => {
   return msg.mensaje ?? ''
 }
 
-
-
-
-onMounted(() => {
+onBeforeMount(() => {
   cargarChats()
   conectarSocket()
 
   listarIntervalo = setInterval(cargarChats, 15000)
 })
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   clearInterval(listarIntervalo)
 })
 </script>

@@ -15,17 +15,8 @@ import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import com.jesus.proyecto.chat._general.websocket.utils.WebSocketUtils;
 import com.jesus.proyecto.chat.archivoMensaje.dto.ArchivoRequest;
-import com.jesus.proyecto.chat.archivoMensaje.entity.ArchivoMensaje;
-import com.jesus.proyecto.chat.archivoMensaje.entity.I_ArchivoMensajeId;
-import com.jesus.proyecto.chat.archivoMensaje.repository.ArchivoMensajeRepository;
 import com.jesus.proyecto.chat.mensajes.dto.SessionMessageState;
-import com.jesus.proyecto.chat.mensajes.entity.Mensaje;
-import com.jesus.proyecto.chat.mensajes.mapper.MensajeMapper;
-import com.jesus.proyecto.chat.mensajes.repository.MensajeRepository;
-import com.jesus.proyecto.chat.usuarios.entity.Usuario;
-import com.jesus.proyecto.chat.usuarios.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 import tools.jackson.databind.ObjectMapper;
@@ -34,14 +25,9 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class WebSocketFileService {
 
-    private final WebSocketUtils webSocketUtils;
     private final WebSocketSessionService sessionService;
     private final WebSocketMessageService messageService;
     private final ObjectMapper objectMapper;
-    private final ArchivoMensajeRepository archivoMensajeRepository;
-    private final MensajeMapper mensajeMapper;
-    private final MensajeRepository mensajeRepository;
-    private final UsuarioRepository usuarioRepository;
 
     @Value("${file.max-size-mb}")
     private int maxFileSizeMb;
@@ -80,21 +66,9 @@ public class WebSocketFileService {
         state.setReceivedFiles(index + 1);
 
         if (state.getReceivedFiles() == state.getExpectedFiles()) {
-            try {
-                guardarArchivos(state);
-            } catch (IllegalArgumentException e) {
-                mandarError(session, "Error de datos: " + e.getMessage());
-                return;
-            } catch (Exception e) {
-                mandarError(session, "Error inesperado al procesar mensaje: " + e.getMessage());
-                return;
-            }
+            guardarArchivos(state);
 
-            try {
-                messageService.finalizarMensaje(session, state);
-            } catch (Exception e) {
-                mandarError(session, "Error al finalizar mensaje: " + e.getMessage());
-            }
+            messageService.finalizarMensaje(session, state);
         }
     }
 
@@ -103,29 +77,6 @@ public class WebSocketFileService {
     // -------------------------
     @Transactional
     private void guardarArchivos(SessionMessageState state) {
-        Usuario usuario;
-        if (state.getUsuarioId() == null) {
-            throw new RuntimeException("getUsuarioId es null " + state.toString());
-        }
-        try {
-            usuario = usuarioRepository.findById(state.getUsuarioId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no existe"));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Error al obtener usuario: " + e.getMessage(), e);
-        } catch (Exception e) {
-            throw new RuntimeException("Error inesperado al buscar usuario", e);
-        }
-
-        Mensaje mensaje = mensajeMapper.toEntity(state.getRequest());
-        mensaje.setUsuario(usuario);
-        mensaje.setTipo(webSocketUtils.calcularTipoMensaje(state));
-
-        try {
-            mensajeRepository.save(mensaje);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al guardar mensaje: "+ e.getMessage(), e);
-        }
-
         for (Map.Entry<Integer, byte[]> entry : state.getArchivos().entrySet()) {
 
             int index = entry.getKey();
@@ -145,24 +96,9 @@ public class WebSocketFileService {
 
             try {
                 Files.write(path, data);
+                state.getRutasArchivos().put(index, safeFilename);
             } catch (IOException e) {
                 throw new RuntimeException("Error escribiendo archivo: " + safeFilename, e);
-            }
-
-            ArchivoMensaje archivo = new ArchivoMensaje();
-
-            I_ArchivoMensajeId id = new I_ArchivoMensajeId();
-            id.setMsgId(state.getMessageId());
-            id.setIndice(index);
-
-            archivo.setId(id);
-            archivo.setUrl(safeFilename);
-            archivo.setMensaje(mensaje);
-
-            try {
-                archivoMensajeRepository.save(archivo);
-            } catch (Exception e) {
-                throw new RuntimeException("Error guardando metadata de archivo", e);
             }
         }
     }

@@ -9,7 +9,7 @@
       :class="{ 'input-error': showError }"
       @focus="clearInputError"
     >
-    <span v-if="errorMsgInterno">{{ errorMsgInterno }}</span>
+    <span v-if="errorMsgInterno" class="error">{{ errorMsgInterno }}</span>
   </div>
 </template>
 
@@ -64,7 +64,7 @@ watch(() => props.modelValue, (nuevo) => {
   display: flex;
   flex-flow: column nowrap;
 }
-.inputElement > span {
+.inputElement > span.error {
   position: absolute;
   top: 100%;
   color: rgb(255, 128, 128);

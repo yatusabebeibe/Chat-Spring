@@ -3,7 +3,7 @@ package com.jesus.proyecto.chat._general.utils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 
-public class CookieUtils {
+public abstract class CookieUtils {
 
     public static String getCookieValue(HttpServletRequest request, String name) {
         if (request.getCookies() == null) return null;

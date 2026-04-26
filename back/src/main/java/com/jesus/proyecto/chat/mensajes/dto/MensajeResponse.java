@@ -1,6 +1,7 @@
 package com.jesus.proyecto.chat.mensajes.dto;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,7 +23,7 @@ public class MensajeResponse {
 
     private String mensaje;
 
-    // private String urlArchivo; // puede ser null
+    List<String> urls;
 
     private Instant fechaEnvio;
 

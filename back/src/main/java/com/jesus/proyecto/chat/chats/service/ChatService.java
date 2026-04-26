@@ -78,7 +78,7 @@ public class ChatService {
     }
 
     public Chat obtenerOCrearConversacion(Usuario usr1, UUID idUsr2) {
-        if (usr1.getId() == idUsr2) {
+        if (usr1.getId().equals(idUsr2)) {
             throw new MismoUsuarioException();
         }
         Usuario usr2 = usuarioRepository.findById(idUsr2)
