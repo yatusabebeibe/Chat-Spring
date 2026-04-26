@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jesus.proyecto.chat._general.exceptions.ChatNoEncontradoException;
+import com.jesus.proyecto.chat._general.exceptions.MismoUsuarioException;
 import com.jesus.proyecto.chat._general.exceptions.UsuarioNoEncontradoException;
 import com.jesus.proyecto.chat.chats.dto.ChatRequest;
 import com.jesus.proyecto.chat.chats.dto.ChatResponse;
@@ -77,6 +78,9 @@ public class ChatService {
     }
 
     public Chat obtenerOCrearConversacion(Usuario usr1, UUID idUsr2) {
+        if (usr1.getId() == idUsr2) {
+            throw new MismoUsuarioException();
+        }
         Usuario usr2 = usuarioRepository.findById(idUsr2)
                 .orElseThrow(() -> new UsuarioNoEncontradoException());
 

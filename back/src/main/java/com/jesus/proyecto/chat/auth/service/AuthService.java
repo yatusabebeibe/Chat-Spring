@@ -76,6 +76,9 @@ public class AuthService {
 
         generarTokensYCookies(usuario, response);
 
+        usuario.setFechaUltimaConexion(Instant.now());
+        usuarioRepository.save(usuario);
+
         return crearResponse(usuario);
     }
 
@@ -132,7 +135,7 @@ public class AuthService {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(tokenJwt)
                 .orElseThrow(() -> new MyAuthException("Refresh token invalido"));
 
-        if (!refreshToken.isRevocado()) {
+        if (refreshToken.isRevocado()) {
             throw new MyAuthException("Refresh token revocado");
         }
 
@@ -174,7 +177,7 @@ public class AuthService {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setToken(token);
         refreshToken.setUsuario(usuario);
-        refreshToken.setRevocado(true);
+        refreshToken.setRevocado(false);
         refreshToken.setFechaExpiracion(
                 Instant.now().plusMillis(jwtConfig.getRefreshExpiration()));
         refreshTokenRepository.save(refreshToken);
@@ -199,7 +202,8 @@ public class AuthService {
     private Cookie generarCookie(String nombre, String token, long edad) {
         Cookie cookie = new Cookie(nombre, token);
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
+        // cookie.setSecure(true);
+        cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge((int) (edad / 1000));
         return cookie;

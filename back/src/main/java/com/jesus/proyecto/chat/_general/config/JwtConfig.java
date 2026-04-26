@@ -29,9 +29,6 @@ public class JwtConfig {
 
 
     public String getSecretKey() {
-        System.out.println("\n-------");
-        System.out.println(secretKey);
-        System.out.println("-------\n");
         if (secretKey.length() < 32) {
             throw new IllegalArgumentException("Clave secreta debe ser al menos 256 bits (32 chars ASCII)");
         }

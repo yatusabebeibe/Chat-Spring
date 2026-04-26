@@ -1,11 +1,13 @@
 package com.jesus.proyecto.chat.mensajes.entity;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.jesus.proyecto.chat._general.utils.UUIDv7;
+import com.jesus.proyecto.chat.archivoMensaje.entity.ArchivoMensaje;
 import com.jesus.proyecto.chat.chats.entity.Chat;
 import com.jesus.proyecto.chat.mensajes.utils.TipoMensaje;
 import com.jesus.proyecto.chat.usuarios.entity.Usuario;
@@ -18,6 +20,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -64,9 +67,6 @@ public class Mensaje {
     @Column(columnDefinition = "TEXT")
     private String mensaje;
 
-    @Column(length = 255)
-    private String urlArchivo;
-
     @Column(nullable = false, columnDefinition = "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     private Instant fechaEnvio = Instant.now();
@@ -76,5 +76,8 @@ public class Mensaje {
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean eliminado = false;
+
+    @OneToMany(mappedBy = "mensaje", fetch = FetchType.LAZY)
+    private List<ArchivoMensaje> archivos;
 
 }

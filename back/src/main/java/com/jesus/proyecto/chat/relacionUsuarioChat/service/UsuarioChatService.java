@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.jesus.proyecto.chat._general.exceptions.ChatNoEncontradoException;
-import com.jesus.proyecto.chat._general.exceptions.ConversacionNoAmditeMiembrosException;
+import com.jesus.proyecto.chat._general.exceptions.MismoUsuarioException;
 import com.jesus.proyecto.chat._general.exceptions.UsuarioNoEncontradoException;
 import com.jesus.proyecto.chat.chats.entity.Chat;
 import com.jesus.proyecto.chat.chats.repository.ChatRepository;
@@ -34,7 +34,7 @@ public class UsuarioChatService {
         if (chat.getTipo() != TipoChat.GRUPO) {
             long cantidad = usuarioChatRepository.contarUsuariosEnChat(chat.getId());
             if (cantidad >= 2) {
-                throw new ConversacionNoAmditeMiembrosException();
+                throw new MismoUsuarioException();
             }
         }
 
@@ -59,7 +59,10 @@ public class UsuarioChatService {
         agregarUsuario(usuario, chat, RolEnChat.MIEMBRO);
     }
 
-    public boolean usuarioEstaEnGrupo(UUID chatId, UUID usuarioId) {        
+    public boolean usuarioEstaEnGrupo(UUID chatId, UUID usuarioId) {      
+        if (chatId == null || usuarioId == null) {
+            return false;
+        }
         return usuarioChatRepository.existsById_IdUsuarioAndId_IdChat(usuarioId, chatId);
     }
 

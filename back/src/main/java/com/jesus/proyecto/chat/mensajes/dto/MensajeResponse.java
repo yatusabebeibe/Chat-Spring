@@ -6,14 +6,10 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jesus.proyecto.chat.mensajes.utils.TipoMensaje;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MensajeResponse {
 
     private UUID id;
@@ -26,7 +22,7 @@ public class MensajeResponse {
 
     private String mensaje;
 
-    private String urlArchivo; // puede ser null
+    // private String urlArchivo; // puede ser null
 
     private Instant fechaEnvio;
 

@@ -1,4 +1,4 @@
-export const obtenerFechaChat = (chat) => {
+export const obtenerFechaChats = (chat) => {
   return new Date(
     chat.ultimoMensaje?.fechaEnvio ||
     chat.fechaCreacion ||
@@ -10,21 +10,17 @@ export const buscarIndexPorId = (lista, id) => {
   return lista.findIndex(item => item.id === id)
 }
 
-export const mergeChats = (listaActual, nuevosChats) => {
+export const mergeChats = (mapActual, nuevosChats) => {
   nuevosChats.forEach((nuevoChat) => {
-    const index = buscarIndexPorId(listaActual, nuevoChat.id)
+    const actual = mapActual.get(nuevoChat.id)
 
-    if (index === -1) {
-      listaActual.push(nuevoChat)
+    if (!actual) {
+      mapActual.set(nuevoChat.id, nuevoChat)
       return
     }
 
-    const actual = listaActual[index]
-
-    if (obtenerFechaChat(nuevoChat) > obtenerFechaChat(actual)) {
-      listaActual[index] = nuevoChat
+    if (obtenerFechaChats(nuevoChat) > obtenerFechaChats(actual)) {
+      mapActual.set(nuevoChat.id, nuevoChat)
     }
   })
-
-  listaActual.sort((a, b) => obtenerFechaChat(b) - obtenerFechaChat(a))
 }

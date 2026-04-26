@@ -14,10 +14,11 @@ public interface MensajeMapper {
     @Mapping(target = "fechaEnvio", ignore = true)
     @Mapping(target = "fechaEdicion", ignore = true)
     @Mapping(target = "eliminado", ignore = true)
+    @Mapping(target = "archivos", ignore = true)
 
-    @Mapping(target = "chat.id", source = "chatId")
     @Mapping(target = "usuario.id", ignore = true)
-    @Mapping(target = "mensajeRespuesta.id", ignore = true /* source = "mensajeRespuestaId" */)
+    @Mapping(target = "chat.id", source = "chatId")
+    @Mapping(target = "mensajeRespuesta", ignore = true)
     Mensaje toEntity(MensajeRequest request);
 
     @Mapping(target = "chatId", source = "chat.id")

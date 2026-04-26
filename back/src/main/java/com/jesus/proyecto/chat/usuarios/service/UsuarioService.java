@@ -67,21 +67,7 @@ public class UsuarioService {
     }
 
     public List<UsuarioResponse> listarPorUsuarioYNombreResponse(String texto) {
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println(usuarioRepository
-            // .searchByUsuarioContainingIgnoreCaseOrNombreContainingIgnoreCase(texto, texto)
-            .findUsuariosPorNombreOUsuario(texto)
-            .stream()
-            .map(usuarioMapper::toResponse)
-            .toList()
-        );
-        System.out.println();
-        System.out.println();
-        System.out.println();
         return usuarioRepository
-                // .searchByUsuarioContainingIgnoreCaseOrNombreContainingIgnoreCase(texto, texto)
                 .findUsuariosPorNombreOUsuario(texto)
                 .stream()
                 .map(usuarioMapper::toResponse)

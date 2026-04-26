@@ -24,4 +24,7 @@ public interface MensajeRepository extends JpaRepository<Mensaje, UUID> {
 
     Optional<Mensaje> findFirstByChatIdAndEliminadoFalseOrderByFechaEnvioDesc(UUID chatId);
 
+    List<Mensaje> findTop25ByChatIdAndEliminadoFalseOrderByIdDesc(UUID chatId); // obtien lista de los 25 ultimos mensajes
+    List<Mensaje> findTop25ByChatIdAndEliminadoFalseAndIdLessThanOrderByIdDesc(UUID chatId, UUID msgId); // ^ a partir de X msg
+
 }

@@ -1,6 +1,10 @@
-import { ref } from "vue"
-import { mergeChats } from '@/utils/chat.js'
 import router from "@/router/index.js"
+import { mergeChats } from '@/utils/chat.js'
+import { computed, ref } from "vue"
+
+
+export const chatsMap = ref(new Map())
+
 
 // funcion base sin logica de retry
 async function rawFetch(url, body = null, method = "GET") {
@@ -34,23 +38,26 @@ async function rawFetch(url, body = null, method = "GET") {
 export async function apiFetch(url, body = null, method = "GET") {
   const res = await rawFetch(url, body, method)
 
+  console.log("fech 1", res);
+  
+
   if (res.data?.error === "Necesitas autenticarte") {
     const refresh = await rawFetch("/auth/refresh", null, "POST")
 
-    console.log("refresh: ",refresh);
+    console.log("fetch 2 refresh: ",refresh);
 
-    if (!refresh.ok) {
+    const res2 = await rawFetch(url, body, method)
+    console.log("fech 3", res2);
+    if (!res2.ok) {
       router.push({ name:"login" })
     }
     else {
-      return rawFetch(url, body, method)
+      return res2
     }
   }
 
   return res
 }
-
-export const listaChats = ref([])
 
 export const cargarChats = async () => {
   const res = await apiFetch('/chat')
@@ -60,8 +67,10 @@ export const cargarChats = async () => {
     return
   }
 
-  console.log(listaChats.value);
-  
-
-  mergeChats(listaChats.value, res.data)
+  mergeChats(chatsMap.value, res.data)
 }
+
+export const listaChats = computed(() => {
+  return Array.from(chatsMap.value.values())
+    .sort((a, b) => obtenerFechaChats(b) - obtenerFechaChats(a))
+})

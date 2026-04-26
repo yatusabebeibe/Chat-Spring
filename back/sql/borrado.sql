@@ -2,6 +2,7 @@
 -- DROP TABLAS 
 -- ============================================
 DROP TABLE IF EXISTS refresh_tokens;
+DROP TABLE IF EXISTS archivo_mensaje;
 DROP TABLE IF EXISTS mensaje_leido;
 DROP TABLE IF EXISTS usuario_chat;
 DROP TABLE IF EXISTS mensajes;
