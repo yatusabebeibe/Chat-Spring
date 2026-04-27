@@ -25,11 +25,13 @@ main {
   display: grid;
   grid-template-columns: minmax(275px, 100%) 0;
   grid-auto-rows: 100%;
+  max-height: calc(100% - var(--headerWidth))
 }
 
-@media (min-width: 635px) {
+@media (min-width: 692px) {
   main {
     grid-template-columns: clamp(275px, 25%, 415px) 1fr;
+    max-height: 100%
   }
 }
 </style>

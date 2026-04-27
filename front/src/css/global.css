@@ -82,7 +82,7 @@ body > header > * { height: 100%; }
 .icon:hover { transform: scale(1.15); }
 
 
-@media (min-width: 635px) {
+@media (min-width: 692px) {
   body {
     flex-flow: row;
   }

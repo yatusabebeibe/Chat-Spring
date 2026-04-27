@@ -1,6 +1,7 @@
 package com.jesus.proyecto.chat._general.websocket.service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import com.jesus.proyecto.chat.archivoMensaje.entity.ArchivoMensaje;
 import com.jesus.proyecto.chat.archivoMensaje.entity.I_ArchivoMensajeId;
 import com.jesus.proyecto.chat.archivoMensaje.repository.ArchivoMensajeRepository;
 import com.jesus.proyecto.chat.mensajes.dto.CrearMensajeRequest;
+import com.jesus.proyecto.chat.mensajes.dto.MensajeResponse;
 import com.jesus.proyecto.chat.mensajes.dto.SessionMessageState;
 import com.jesus.proyecto.chat.mensajes.entity.Mensaje;
 import com.jesus.proyecto.chat.mensajes.mapper.MensajeMapper;
@@ -129,9 +131,14 @@ public class WebSocketMessageService {
 
         sessionService.remove(session);
 
+        MensajeResponse msgRespuesta = mensajeMapper.toResponse(guardado);
+        if (state.getRutasArchivos() !=null) {
+            msgRespuesta.setUrls(new ArrayList<>(state.getRutasArchivos().values()));
+        }
+
         Map<String, Object> response = new HashMap<>();
         response.put("type", "NEW_MESSAGE");
-        response.put("message", mensajeMapper.toResponse(guardado));
+        response.put("message", msgRespuesta);
 
         String msgJson = objectMapper.writeValueAsString(response);
         roomService.broadcast(state.getChatId(), msgJson);

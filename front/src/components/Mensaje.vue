@@ -7,7 +7,21 @@
     </div>
 
     <div class="body">
-      <p v-if="mensaje.mensaje">{{ mensaje.mensaje }}</p>
+      <div style="position: relative;">
+        <div class="mensaje-texto" v-if="mensaje.mensaje">
+          {{ mensaje.mensaje }}
+        </div>
+
+        <!-- RESUMEN -->
+        <div v-if="mensaje.resumen" class="resumen">
+          <strong>Resumen:</strong>
+          <p>{{ mensaje.resumen }}</p>
+        </div>
+
+        <button @click="resumirMensaje">
+          Resumir
+        </button>
+      </div>
 
       <!-- IMAGEN -->
       <div v-if="mensaje.tipo === 'IMAGEN' && mensaje.urls">
@@ -45,6 +59,8 @@
 </template>
 
 <script setup>
+import { apiFetch } from '@/utils/api.js'
+
 const props = defineProps({
   mensaje: Object
 })
@@ -53,6 +69,24 @@ const emit = defineEmits(['responder'])
 
 function responder() {
   emit('responder', props.mensaje.mensajeRespuestaId)
+}
+
+async function resumirMensaje() {
+  try {
+    const url = `/msg/resumir?id=${props.mensaje.id}`
+
+    const res = await apiFetch(url)
+
+    // if (!res.ok) return
+
+    // dependiendo de tu backend puede venir como string o {data: "..."}
+    const resumen = res.data.mensaje
+
+    // importante: asegurar reactividad
+    props.mensaje.resumen = resumen
+  } catch (e) {
+    console.error("Error al resumir mensaje:", e)
+  }
 }
 
 function getUrl(url) {
@@ -72,6 +106,11 @@ function formatDate(date) {
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 6px;
+}
+.mensaje-texto {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .header {

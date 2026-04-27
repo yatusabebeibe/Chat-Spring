@@ -32,25 +32,37 @@
     <!-- FOOTER (input de mensaje) -->
     <footer class="chat-footer">
 
-      <label class="file-btn">
-        📎
-        <input
-          type="file"
-          multiple
-          @change="onFiles"
-          hidden
+      <div v-if="pendingFiles.length" class="files-preview">
+        <div v-for="(file, i) in pendingFiles" :key="i" class="file-chip" @click="eliminarArchivo(i)">
+          {{ file.name }}
+        </div>
+      </div>
+
+      <div>
+        <label class="file-btn">
+          📎
+          <input
+            type="file"
+            multiple
+            @change="onFiles"
+            hidden
+          />
+        </label>
+
+        <textarea
+          v-model="texto"
+          placeholder="Escribe un mensaje..."
+          class="input textarea"
+          rows="1"
+          ref="textareaRef"
+          @input="autoResize"
+          @keydown.enter.exact.prevent="enviar"
         />
-      </label>
 
-      <input
-        v-model="texto"
-        placeholder="Escribe un mensaje..."
-        class="input"
-      />
-
-      <button class="send" @click="enviar">
-        ➤
-      </button>
+        <button class="send" @click="enviar">
+          ➤
+        </button>
+      </div>
 
     </footer>
 
@@ -72,27 +84,29 @@ const chatMain = ref(null)
 
 const texto = ref("")
 const archivos = ref([])
+const textareaRef = ref(null)
 
 const tituloChat = ref("Chat")
 const avatarUrl = ref("/default.png")
 
-let pendingFiles = []
+const pendingFiles = ref([])
 
 const abrirMenu = () => {
   console.log("menu")
 }
 
 const onFiles = (e) => {
-  pendingFiles = Array.from(e.target.files)
+  pendingFiles.value = Array.from(e.target.files)
 }
 
 const enviar = () => {
   if (!socket.value || socket.value.readyState !== 1) return
+  if (!texto.value && !pendingFiles.value.length) return
 
   const payload = {
     chatId: route.params.chatId, // luego lo conectas al chat seleccionado
     mensaje: texto.value,
-    archivos: pendingFiles.map(f => ({
+    archivos: pendingFiles.value.map(f => ({
       nombre: f.name,
       tipo: f.type
     }))
@@ -102,12 +116,12 @@ const enviar = () => {
 }
 
 window.addEventListener("ws-message-ready", async () => {
-  for (const file of pendingFiles) {
+  for (const file of pendingFiles.value) {
     const buffer = await file.arrayBuffer()
     socket.value.send(buffer)
   }
 
-  pendingFiles = []
+  pendingFiles.value = []
   texto.value = ""
 })
 
@@ -116,6 +130,20 @@ const scrollAbajo = async () => {
   if (chatMain.value) {
     chatMain.value.scrollTop = chatMain.value.scrollHeight
   }
+}
+
+const autoResize = () => {
+  const el = textareaRef.value
+  if (!el) return
+
+  el.style.height = "auto"
+  const maxHeight = 24 * 3 + 20 // ~3 líneas
+
+  el.style.height = Math.min(el.scrollHeight, maxHeight) + "px"
+}
+
+const eliminarArchivo = (index) => {
+  pendingFiles.value.splice(index, 1)
 }
 
 onBeforeMount(async () => {
@@ -172,32 +200,40 @@ onBeforeUnmount(() => {
   padding: 10px;
 }
 
+.file-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.file-btn:hover {
+  background: #dddddd4b;
+}
+
 /* FOOTER */
 .chat-footer {
   display: flex;
-  gap: 10px;
-  padding: 10px;
-  border-top: 1px solid #ddd;
-}
-
-.input {
-  flex: 1;
-  padding: 8px;
-}
-
-.send {
-  padding: 8px 12px;
-}
-
-.chat-footer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column; /* 👈 clave */
+  gap: 6px;
   padding: 8px;
   border-top: 1px solid #ddd;
   background: hsla(0, 0%, 10%, 0.33);
 }
 
+/* contenedor inferior (input + botones) */
+.chat-footer > div:last-child {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* textarea */
 .input {
   flex: 1;
   padding: 10px 14px;
@@ -210,6 +246,7 @@ onBeforeUnmount(() => {
   border-color: #888;
 }
 
+/* botón enviar */
 .send {
   width: 40px;
   height: 40px;
@@ -225,6 +262,7 @@ onBeforeUnmount(() => {
   background: #43a047;
 }
 
+/* botón archivo */
 .file-btn {
   width: 40px;
   height: 40px;
@@ -239,5 +277,34 @@ onBeforeUnmount(() => {
 
 .file-btn:hover {
   background: #dddddd4b;
+}
+
+/* textarea comportamiento */
+.textarea {
+  resize: none;
+  overflow-y: auto;
+  max-height: 100px;
+}
+
+/* preview archivos arriba */
+.files-preview {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 4px 2px;
+}
+
+/* chips */
+.file-chip {
+  background: #ddd;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.file-chip:hover {
+  background: #bbb;
 }
 </style>

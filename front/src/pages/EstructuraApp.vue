@@ -19,7 +19,7 @@ const pagsBarraLateral = ref([
 .b { background-color: rgba(0, 0, 255, 0.3);}
 div {--display: flex;}
 .secundario { --display: none; }
-@media (min-width: 635px) {
+@media (min-width: 692px) {
   .secundario { --display: flex; }
 }
 
@@ -29,7 +29,7 @@ div {--display: flex;}
   flex-flow: column;
 }
 
-@media (min-width: 635px) {
+@media (min-width: 692px) {
   #panel {
     padding-top: 0;
   }

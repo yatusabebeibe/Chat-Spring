@@ -82,4 +82,8 @@ public class MensajeService {
             PageRequest.of(0, size)
         );
     }
+
+    public Mensaje obtenerMensaje(UUID id) {
+        return mensajeRepository.findById(id).orElse(null);
+    }
 }
