@@ -15,9 +15,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.jesus.proyecto.chat._general.utils.Paginacion;
-import com.jesus.proyecto.chat.chats.service.ChatService;
+import com.jesus.proyecto.chat.relacionUsuarioChat.mapper.UsuarioChatMapper;
+import com.jesus.proyecto.chat.relacionUsuarioChat.service.UsuarioChatService;
+import com.jesus.proyecto.chat.usuarios.dto.UsuarioChatResponse;
 import com.jesus.proyecto.chat.usuarios.dto.UsuarioRequest;
-import com.jesus.proyecto.chat.usuarios.dto.UsuarioResponse;
 import com.jesus.proyecto.chat.usuarios.entity.Usuario;
 import com.jesus.proyecto.chat.usuarios.mapper.UsuarioMapper;
 import com.jesus.proyecto.chat.usuarios.service.UsuarioService;
@@ -30,17 +31,18 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class UsuarioController {
 
-    private final ChatService chatService;
     private final UsuarioMapper usuarioMapper;
     private final UsuarioService usuarioService;
+    private final UsuarioChatMapper usuarioChatMapper;
+    private final UsuarioChatService usuarioChatService;
 
     @GetMapping({"", "/"})
     public ResponseEntity<?> buscar(@ModelAttribute UsuarioRequest request, @RequestParam(required = false) UUID chatId) {
 
         if (chatId != null) {
-            List<UsuarioResponse> response = chatService.obtenerMiembrosDeGrupo(chatId)
+            List<UsuarioChatResponse> response = usuarioChatService.obtenerMiembrosDeGrupo(chatId)
                     .stream()
-                    .map(usr -> usuarioMapper.toResponse(usr))
+                    .map(usuarioChatMapper::toResponse)
                     .toList();
             return ResponseEntity.ok(response);
         }

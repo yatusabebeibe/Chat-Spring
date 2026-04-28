@@ -86,4 +86,8 @@ public class UsuarioChatService {
                 .map(usrChat -> usrChat.getChat())
                 .toList();
     }
+
+    public List<UsuarioChat> obtenerMiembrosDeGrupo(UUID chatId) {
+        return usuarioChatRepository.findById_IdChat(chatId);
+    }
 }

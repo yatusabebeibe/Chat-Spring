@@ -1,6 +1,5 @@
 package com.jesus.proyecto.chat.chats.service;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -18,8 +17,6 @@ import com.jesus.proyecto.chat.chats.entity.Chat;
 import com.jesus.proyecto.chat.chats.mapper.ChatMapper;
 import com.jesus.proyecto.chat.chats.repository.ChatRepository;
 import com.jesus.proyecto.chat.chats.utils.TipoChat;
-import com.jesus.proyecto.chat.relacionUsuarioChat.entity.UsuarioChat;
-import com.jesus.proyecto.chat.relacionUsuarioChat.repository.UsuarioChatRepository;
 import com.jesus.proyecto.chat.relacionUsuarioChat.service.UsuarioChatService;
 import com.jesus.proyecto.chat.usuarios.entity.Usuario;
 import com.jesus.proyecto.chat.usuarios.repository.UsuarioRepository;
@@ -34,7 +31,6 @@ public class ChatService {
 
     private final ChatRepository chatRepository;
     private final UsuarioRepository usuarioRepository;
-    private final UsuarioChatRepository usuarioChatRepository;
     private final UsuarioChatService usuarioChatService;
     private final ChatMapper chatMapper;
 
@@ -104,12 +100,6 @@ public class ChatService {
         return chatRepository
             .findById(id)
             .orElseThrow(() -> new ChatNoEncontradoException());
-    }
-
-    public List<Usuario> obtenerMiembrosDeGrupo(UUID chatId) {
-        List<UsuarioChat> miembros = usuarioChatRepository.findById_IdChat(chatId);
-
-        return miembros.stream().map(UsuarioChat::getUsuario).toList();
     }
 
     public ChatResponse actualizar(ChatUpdateRequest chatUpdateRequest) {

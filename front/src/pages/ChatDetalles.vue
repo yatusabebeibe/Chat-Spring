@@ -34,8 +34,31 @@
       </div>
     </div>
 
+    <div class="usuarios">
+      <h3>Miembros</h3>
+
+      <div
+        v-for="[id, usuario] in usuarios"
+        :key="id"
+        class="usuario"
+      >
+        <p class="nombre">
+          {{ usuario.nombre }}
+
+          <span v-if="usuario.rol === 'ADMIN'" class="badge admin">
+            Admin
+          </span>
+
+          <span v-if="id === chatActual.idCreador && chatActual.tipo === 'GRUPO'" class="badge creador">
+            Creador
+          </span>
+        </p>
+
+        <span class="nick">@{{ usuario.usuario }}</span>
+      </div>
+    </div>
+
     <div class="acciones">
-      <button>Ver miembros</button>
       <button class="salir">Salir del grupo</button>
     </div>
   </div>
@@ -43,7 +66,7 @@
 
 <script setup>
 import { apiFetchArchivos, obtenerImgPorDefecto } from "@/utils/api.js"
-import { getChatActual } from "@/utils/chat.js"
+import { getChatActual, mapaUsuariosChatActual } from "@/utils/chat.js"
 import { computed, ref } from "vue"
 import { useRoute } from "vue-router"
 
@@ -52,10 +75,15 @@ const fileInput = ref(null)
 
 const chatActual = computed(() => getChatActual(route.params.chatId).value)
 
+const usuarios = computed(() => {
+  return Array.from(mapaUsuariosChatActual.value.entries())
+})
+
 const imagenChat = computed(() => {
   const ext = chatActual.value?.extensionImagen || "jpg"
   return `${import.meta.env.VITE_ARCHIVOS_URL}/${route.params.chatId}/0.${ext}`
 })
+
 const imgPorDefecto = computed(() =>
   obtenerImgPorDefecto(chatActual.value?.tipo === "GRUPO")
 )
@@ -68,14 +96,12 @@ const cambiarImagen = async (e) => {
   const file = e.target.files[0]
   if (!file) return
 
-  // preview instantaneo
   const reader = new FileReader()
   reader.onload = (ev) => {
     imagenChat.value = ev.target.result
   }
   reader.readAsDataURL(file)
 
-  // subir al backend
   const res = await apiFetchArchivos(`/${route.params.chatId}`, file)
 
   if (!res.ok) {
@@ -83,7 +109,6 @@ const cambiarImagen = async (e) => {
     return
   }
 
-  // forzar recarga de imagen real (evitar cache)
   imagenChat.value = `${import.meta.env.VITE_ARCHIVOS_URL}/${route.params.chatId}?t=${Date.now()}`
 }
 
@@ -138,6 +163,39 @@ const formatoFecha = (fecha) => {
 .item p {
   margin: 2px 0 0;
   word-break: break-all;
+}
+
+.usuarios {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.usuario {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #f5f5f5;
+}
+
+.nick {
+  font-size: 12px;
+  color: gray;
+}
+
+.badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  margin-left: 6px;
+  border-radius: 6px;
+  color: white;
+}
+
+.admin {
+  background: #4d79ff;
+}
+
+.creador {
+  background: #ffb84d;
 }
 
 .acciones {

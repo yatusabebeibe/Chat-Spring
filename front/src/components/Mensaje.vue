@@ -2,7 +2,7 @@
   <div class="mensaje" :data-id="mensaje.id" :data-respuesta="mensaje.mensajeRespuestaId">
     
     <div class="header">
-      <span class="user">Usuario: {{ mensaje.usuarioId }}</span>
+      <span class="user">{{ usuaioMsg }}</span>
       <span class="fecha">{{ formatDate(mensaje.fechaEnvio) }}</span>
     </div>
 
@@ -60,9 +60,19 @@
 
 <script setup>
 import { apiFetch } from '@/utils/api.js'
+import { mapaUsuariosChatActual } from '@/utils/chat.js'
+import { computed } from 'vue'
 
 const props = defineProps({
   mensaje: Object
+})
+
+const usuaioMsg = computed(() =>{
+  const usuario = mapaUsuariosChatActual.value.get(props.mensaje.usuarioId)
+  if (usuario?.nombre && usuario?.usuario) {
+    return`${usuario.nombre} (@${usuario.usuario})`
+  }
+  return ""
 })
 
 const emit = defineEmits(['responder'])
