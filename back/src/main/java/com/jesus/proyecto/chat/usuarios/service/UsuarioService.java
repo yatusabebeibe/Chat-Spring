@@ -84,4 +84,14 @@ public class UsuarioService {
     public void guardar(Usuario usuarioAuth) {
         usuarioRepository.save(usuarioAuth);
     }
+
+    public Usuario actualizar(UUID id, String nombre) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new UsuarioNoEncontradoException());
+
+        usuario.setNombre(nombre);
+
+        return usuarioRepository.save(usuario);
+    }
 }

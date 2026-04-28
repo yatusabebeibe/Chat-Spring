@@ -16,8 +16,23 @@
         @change="cambiarImagen"
       />
 
-      <div>
-        <h2 class="nombre">{{ usuario.nombre }}</h2>
+      <div ref="nombreBox">
+        <h2
+          v-if="!editandoNombre"
+          class="nombre"
+          @click="activarEdicionNombre"
+        >
+          {{ usuario.nombre }}
+        </h2>
+
+        <input
+          v-else
+          v-model="nombreEdit"
+          class="nombre-input"
+          type="text"
+          @keyup.enter="guardarNombre"
+        />
+
         <p class="nick">@{{ usuario.usuario }}</p>
       </div>
     </div>
@@ -42,36 +57,31 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue"
+import { ref, computed, onMounted, onBeforeUnmount } from "vue"
 import { apiFetch, apiFetchArchivos, obtenerImgPorDefecto } from "@/utils/api.js"
 
 const usuario = ref(null)
 const fileInput = ref(null)
 
-// 🔹 cargar usuario desde /me
+/* CARGA USUARIO */
 const cargarUsuario = async () => {
   const res = await apiFetch("/usuario/me")
 
-  if (!res.ok) {
-    console.error("Error obteniendo usuario")
-    return
-  }
+  if (!res.ok) return
 
   usuario.value = res.data
 }
 
 onMounted(cargarUsuario)
 
-// 🔹 imagen base (backend)
+/* IMAGEN */
 const imagenUsuario = computed(() => {
   if (!usuario.value) return ""
   return `${import.meta.env.VITE_ARCHIVOS_URL}/usuario/${usuario.value.id}`
 })
 
-// 🔹 preview local (cuando subes imagen)
 const imagenPreview = ref(null)
 
-// 🔹 imagen final (preview > backend)
 const imagenFinal = computed(() => {
   return imagenPreview.value || imagenUsuario.value
 })
@@ -88,30 +98,68 @@ const cambiarImagen = async (e) => {
   const file = e.target.files[0]
   if (!file) return
 
-  // preview instantáneo
   const reader = new FileReader()
   reader.onload = (ev) => {
     imagenPreview.value = ev.target.result
   }
   reader.readAsDataURL(file)
 
-  // 👇 SIN id en la URL
   const res = await apiFetchArchivos(`/usuario`, file)
 
-  if (!res.ok) {
-    console.error("Error subiendo imagen", res.data)
-    return
-  }
+  if (!res.ok) return
 
   imagenPreview.value = null
   await cargarUsuario()
 }
 
-// 🔹 formato fechas bonito
+/* FECHA */
 const formatoFecha = (fecha) => {
   if (!fecha) return "—"
   return new Date(fecha).toLocaleString()
 }
+
+/* EDITAR NOMBRE */
+const editandoNombre = ref(false)
+const nombreEdit = ref("")
+const nombreBox = ref(null)
+
+const activarEdicionNombre = () => {
+  if (!usuario.value) return
+  nombreEdit.value = usuario.value.nombre
+  editandoNombre.value = true
+}
+
+const guardarNombre = async () => {
+  const payload = {
+    id: usuario.value.id,
+    nombre: nombreEdit.value
+  }
+
+  const res = await apiFetch("/usuario", payload, "PUT")
+
+  if (!res.ok) return
+
+  usuario.value.nombre = nombreEdit.value
+  editandoNombre.value = false
+}
+
+/* CLICK FUERA */
+const cancelarEdicionSiClickFuera = (e) => {
+  if (!editandoNombre.value) return
+
+  const path = e.composedPath?.() || []
+  if (nombreBox.value && !path.includes(nombreBox.value)) {
+    editandoNombre.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener("click", cancelarEdicionSiClickFuera)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", cancelarEdicionSiClickFuera)
+})
 </script>
 
 <style scoped>
@@ -141,6 +189,7 @@ const formatoFecha = (fecha) => {
 
 .nombre {
   margin: 0;
+  cursor: pointer;
 }
 
 .nick {

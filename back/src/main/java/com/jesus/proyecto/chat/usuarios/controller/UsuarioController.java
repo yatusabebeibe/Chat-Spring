@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,10 +23,12 @@ import com.jesus.proyecto.chat.relacionUsuarioChat.mapper.UsuarioChatMapper;
 import com.jesus.proyecto.chat.relacionUsuarioChat.service.UsuarioChatService;
 import com.jesus.proyecto.chat.usuarios.dto.UsuarioChatResponse;
 import com.jesus.proyecto.chat.usuarios.dto.UsuarioRequest;
+import com.jesus.proyecto.chat.usuarios.dto.UsuarioUpdateRequest;
 import com.jesus.proyecto.chat.usuarios.entity.Usuario;
 import com.jesus.proyecto.chat.usuarios.mapper.UsuarioMapper;
 import com.jesus.proyecto.chat.usuarios.service.UsuarioService;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 
@@ -79,4 +83,24 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioMapper.toResponseEspecifico(usuario));
     }
 
+    @PutMapping({"", "/"})
+    public ResponseEntity<?> actualizar(
+            @Valid @RequestBody UsuarioUpdateRequest request,
+            Authentication auth
+    ) {
+
+        Usuario usuario = usuarioService.buscarPorUsuario(auth.getName());
+
+        if (usuario == null) {
+            throw new MyAuthException("Usuario no autenticado");
+        }
+
+        if (request.getNombre() == null || request.getNombre().isBlank()) {
+            throw new MyAuthException("El nuevo nombre no puede estar vacío");
+        }
+
+        Usuario actualizado = usuarioService.actualizar(usuario.getId(), request.getNombre());
+
+        return ResponseEntity.ok(usuarioMapper.toResponseEspecifico(actualizado));
+    }
 }
