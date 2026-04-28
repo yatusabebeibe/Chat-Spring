@@ -1,18 +1,20 @@
 package com.jesus.proyecto.chat.chats.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jesus.proyecto.chat.mensajes.dto.MensajeResponse;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ChatListResponse extends ChatResponse {
 
     private MensajeResponse ultimoMensaje; // para preview del último mensaje en la interfaz y su fecha y hora
+
+    private String avatarConversacion;
 
 }

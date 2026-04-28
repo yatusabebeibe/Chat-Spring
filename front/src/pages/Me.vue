@@ -65,9 +65,7 @@ onMounted(cargarUsuario)
 // 🔹 imagen base (backend)
 const imagenUsuario = computed(() => {
   if (!usuario.value) return ""
-
-  const ext = usuario.value.extensionAvatar || "jpg"
-  return `${import.meta.env.VITE_ARCHIVOS_URL}/${usuario.value.id}/avatar.${ext}`
+  return `${import.meta.env.VITE_ARCHIVOS_URL}/usuario/${usuario.value.id}`
 })
 
 // 🔹 preview local (cuando subes imagen)
@@ -97,14 +95,14 @@ const cambiarImagen = async (e) => {
   }
   reader.readAsDataURL(file)
 
-  const res = await apiFetchArchivos(`/${usuario.value.id}`, file)
+  // 👇 SIN id en la URL
+  const res = await apiFetchArchivos(`/usuario`, file)
 
   if (!res.ok) {
     console.error("Error subiendo imagen", res.data)
     return
   }
 
-  // limpiar preview y recargar datos reales
   imagenPreview.value = null
   await cargarUsuario()
 }

@@ -46,7 +46,7 @@
       <div v-if="mensaje.tipo === 'OTROS' && mensaje.urls">
         <div v-for="(url, i) in mensaje.urls" :key="i" class="file">
           <span>{{ url }}</span>
-          <a :href="url" download>Descargar</a>
+          <button @click="descargar(url)">Descargar</button>
         </div>
       </div>
     </div>
@@ -107,6 +107,35 @@ function getUrl(url) {
 
 function formatDate(date) {
   return new Date(date).toLocaleString()
+}
+
+async function descargar(url) {
+  try {
+    const finalUrl = `${import.meta.env.VITE_ARCHIVOS_URL}/${props.mensaje.chatId}/${url}`
+
+    const response = await fetch(finalUrl, {
+      method: 'GET',
+      credentials: 'include'
+    })
+
+    if (!response.ok) throw new Error('Error en descarga')
+
+    const blob = await response.blob()
+
+    const blobUrl = window.URL.createObjectURL(blob)
+
+    const a = document.createElement('a')
+    a.href = blobUrl
+    a.download = url.split('/').pop()
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+
+    window.URL.revokeObjectURL(blobUrl)
+
+  } catch (e) {
+    console.error('Error descargando:', e)
+  }
 }
 </script>
 

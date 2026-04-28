@@ -1,7 +1,12 @@
 <template>
   <div class="chat-details" v-if="chatActual">
     <div class="header">
-      <img :src="imagenChat" @error="e => e.target.src = imgPorDefecto" class="avatar" @click="seleccionarImagen" />
+      <img
+        :src="imagenChat"
+        @error="e => e.target.src = imgPorDefecto"
+        class="avatar"
+        @click="seleccionarImagen"
+      />
 
       <input
         ref="fileInput"
@@ -11,8 +16,24 @@
         @change="cambiarImagen"
       />
 
-      <div>
-        <h2 class="nombre">{{ chatActual.nombre }}</h2>
+      <div ref="nombreBox">
+        <h2
+          v-if="!editandoNombre"
+          class="nombre"
+          @click="activarEdicionNombre"
+        >
+          {{ chatActual.nombre }}
+        </h2>
+
+        <Inputs
+          v-else
+          v-model="nombreEdit"
+          name="nombre"
+          tipo="text"
+          @keyup.enter="guardarNombre"
+          class="nombre"
+        />
+
         <p class="tipo">{{ chatActual.tipo }}</p>
       </div>
     </div>
@@ -23,7 +44,7 @@
         <p>{{ chatActual.id }}</p>
       </div>
 
-      <div class="item">
+      <div v-if="isGrupo" class="item">
         <span>Creador</span>
         <p>{{ chatActual.idCreador }}</p>
       </div>
@@ -49,7 +70,7 @@
             Admin
           </span>
 
-          <span v-if="id === chatActual.idCreador && chatActual.tipo === 'GRUPO'" class="badge creador">
+          <span v-if="id === chatActual.idCreador && isGrupo" class="badge creador">
             Creador
           </span>
         </p>
@@ -58,16 +79,17 @@
       </div>
     </div>
 
-    <div class="acciones">
+    <div v-if="isGrupo" class="acciones">
       <button class="salir">Salir del grupo</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { apiFetchArchivos, obtenerImgPorDefecto } from "@/utils/api.js"
+import Inputs from "@/components/Inputs.vue"
+import { apiFetchArchivos, obtenerImgPorDefecto, apiFetch } from "@/utils/api.js"
 import { getChatActual, mapaUsuariosChatActual } from "@/utils/chat.js"
-import { computed, ref } from "vue"
+import { computed, ref, onMounted, onBeforeUnmount } from "vue"
 import { useRoute } from "vue-router"
 
 const route = useRoute()
@@ -79,15 +101,21 @@ const usuarios = computed(() => {
   return Array.from(mapaUsuariosChatActual.value.entries())
 })
 
+const isGrupo = computed(() => chatActual.value?.tipo === "GRUPO")
+
 const imagenChat = computed(() => {
   const ext = chatActual.value?.extensionImagen || "jpg"
+  if (chatActual.value?.tipo === "CONVERSACION") {
+    return `${import.meta.env.VITE_ARCHIVOS_URL}/usuario/${chatActual.value.avatarConversacion}`
+  }
   return `${import.meta.env.VITE_ARCHIVOS_URL}/${route.params.chatId}/0.${ext}`
 })
 
 const imgPorDefecto = computed(() =>
-  obtenerImgPorDefecto(chatActual.value?.tipo === "GRUPO")
+  obtenerImgPorDefecto(isGrupo.value)
 )
 
+/* IMAGEN */
 const seleccionarImagen = () => {
   fileInput.value.click()
 }
@@ -112,9 +140,53 @@ const cambiarImagen = async (e) => {
   imagenChat.value = `${import.meta.env.VITE_ARCHIVOS_URL}/${route.params.chatId}`
 }
 
+/* FECHA */
 const formatoFecha = (fecha) => {
   return new Date(fecha).toLocaleString()
 }
+
+/* EDITAR NOMBRE */
+const editandoNombre = ref(false)
+const nombreEdit = ref("")
+const nombreBox = ref(null)
+
+const activarEdicionNombre = () => {
+  if (!isGrupo.value) return
+  nombreEdit.value = chatActual.value.nombre
+  editandoNombre.value = true
+}
+
+const guardarNombre = async () => {
+  const payload = {
+    id: chatActual.value.id,
+    nombre: nombreEdit.value
+  }
+
+  const res = await apiFetch("/chat", payload, "PUT")
+
+  if (!res.ok) return
+
+  chatActual.value.nombre = nombreEdit.value
+  editandoNombre.value = false
+}
+
+/* CLICK FUERA */
+const cancelarEdicionSiClickFuera = (e) => {
+  if (!editandoNombre.value) return
+
+  const path = e.composedPath?.() || []
+  if (nombreBox.value && !path.includes(nombreBox.value)) {
+    editandoNombre.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener("click", cancelarEdicionSiClickFuera)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", cancelarEdicionSiClickFuera)
+})
 </script>
 
 <style scoped>
@@ -131,6 +203,7 @@ const formatoFecha = (fecha) => {
 .header {
   display: flex;
   text-align: center;
+  gap: 20px;
 }
 
 .avatar {
@@ -138,10 +211,12 @@ const formatoFecha = (fecha) => {
   height: 90px;
   border-radius: 50%;
   object-fit: cover;
+  cursor: pointer;
 }
 
 .nombre {
   margin: 10px 0 0;
+  cursor: pointer;
 }
 
 .tipo {

@@ -5,13 +5,11 @@ import java.util.UUID;
 
 import com.jesus.proyecto.chat.chats.utils.TipoChat;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChatResponse {
 
     private UUID id;

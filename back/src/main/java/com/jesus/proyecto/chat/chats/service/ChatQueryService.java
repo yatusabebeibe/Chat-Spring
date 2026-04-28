@@ -45,6 +45,7 @@ public class ChatQueryService {
     private ChatListResponse crearResponseUsuario(Chat chat, UUID usuarioId) {
         ChatListResponse response = crearResponse(chat);
         response.setNombre(chat.getNombreConversacionParaUsuario(usuarioId));
+        response.setAvatarConversacion(chat.getAvatarConversacion(usuarioId));
         return response;
     }
 

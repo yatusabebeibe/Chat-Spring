@@ -81,4 +81,7 @@ public class UsuarioService {
                 .toList();
     }
 
+    public void guardar(Usuario usuarioAuth) {
+        usuarioRepository.save(usuarioAuth);
+    }
 }

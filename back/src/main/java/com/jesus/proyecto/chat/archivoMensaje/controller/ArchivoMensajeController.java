@@ -193,4 +193,91 @@ public class ArchivoMensajeController {
 
         return ResponseEntity.ok("Archivo subido correctamente");
     }
+
+    @PostMapping("/usuario")
+    public ResponseEntity<?> uploadImagenUsuario(
+            @RequestParam MultipartFile file,
+            Authentication auth
+    ) throws Exception
+    {
+        Usuario usuarioAuth = usuarioService.buscarPorUsuario(auth.getName());
+
+        Path folder = Paths.get(PathValidations.BASE_UPLOAD, PathValidations.CARPETA_USRS);
+        Files.createDirectories(folder);
+
+        String originalName = file.getOriginalFilename();
+
+        if (originalName == null || !originalName.contains(".")) {
+            return ResponseEntity.badRequest().body("Tipo de archivo incorrecto");
+        }
+
+        String extension = originalName.substring(originalName.lastIndexOf(".") + 1);
+
+        TipoMensaje tipo = aiService.detectarTipoMensaje(List.of(extension));
+
+        if (tipo != TipoMensaje.IMAGEN) {
+            return ResponseEntity.badRequest().body("Solo se permiten imágenes");
+        }
+
+        // borrar anterior
+        try (Stream<Path> files = Files.list(folder)) {
+            files.filter(p -> p.getFileName().toString().startsWith(usuarioAuth.getId().toString() + "."))
+                .forEach(p -> {
+                    try {
+                        Files.deleteIfExists(p);
+                    } catch (Exception ignored) {}
+                });
+        }
+
+        // guardar en BD
+        usuarioAuth.setExtensionAvatar(extension);
+        usuarioService.guardar(usuarioAuth);
+
+        String filename = usuarioAuth.getId().toString() + "." + extension;
+        Path target = folder.resolve(filename);
+
+        try (var inputStream = file.getInputStream()) {
+            Files.copy(inputStream, target, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return ResponseEntity.ok("Imagen de usuario actualizada");
+    }
+
+    @GetMapping("/usuario/{usrId}")
+    public ResponseEntity<Resource> getImagenUsuario(
+            @PathVariable UUID usrId,
+            Authentication auth
+    ) throws MalformedURLException
+    {
+        if (auth == null || auth.getName() == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        Usuario usuario = usuarioService.buscarPorId(usrId);
+
+        if (usuario == null || usuario.getExtensionAvatar() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String archivo = usrId.toString() + "." + usuario.getExtensionAvatar();
+
+        Path filePath = Paths.get(PathValidations.BASE_UPLOAD, PathValidations.CARPETA_USRS)
+                .resolve(archivo)
+                .normalize();
+
+        Resource resource = new UrlResource(filePath.toUri());
+
+        if (!resource.exists() || !resource.isReadable()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        MediaType mediaType = MediaTypeFactory.getMediaType(resource)
+                .orElse(MediaType.APPLICATION_OCTET_STREAM);
+
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" + archivo + "\"")
+                .body(resource);
+    }
 }

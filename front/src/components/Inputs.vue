@@ -1,6 +1,6 @@
 <template>
   <div class="inputElement">
-    <p>{{ texto }}:</p>
+    <p v-if="texto">{{ texto }}:</p>
     <input
       v-model="modelValueLocal"
       :type="tipo"

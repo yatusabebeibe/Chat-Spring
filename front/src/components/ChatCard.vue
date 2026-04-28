@@ -1,54 +1,58 @@
 <template>
   <RouterLink
-    :to="{ name: 'chatRoom', params: { chatId: props.chatId } }"
-    class="chatCard" :class="esGrupo ? 'grupo' : 'conversacion'"
+    :to="{ name: 'chatRoom', params: { chatId: chat.id } }"
+    class="chatCard"
+    :class="chat.tipo === 'GRUPO' ? 'grupo' : 'conversacion'"
   >
-    <!-- <img src="/favicon.ico" alt=""> -->
-    <img 
-      :src="imagenChat" 
-      @error="imagenChat = imgPorDefecto"
+    <img
+      :src="imagenChat"
+      @error="imgError = true"
       alt=""
     />
+
     <div>
-      <h3>{{ props.titulo }}</h3>
-      <span>{{ formatearFecha(props.fechaUltimoMsg) }}</span>
+      <h3>{{ chat.nombre }}</h3>
+      <span>{{ formatearFecha(fechaUltimoMsg) }}</span>
       <p>{{ mensajeFormateado }}</p>
     </div>
   </RouterLink>
 </template>
-
-<!--  -->
 
 <script setup>
 import { obtenerImgPorDefecto } from '@/utils/api.js';
 import { computed, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 
-const props =  defineProps({
-  fechaUltimoMsg: { type: String, required: true },
-  chatId: { type: String, required: true },
-  titulo: { type: String, required: true },
-  msg: { type: String, required: true },
-  extensionImg: { type: String, required: false },
-  esGrupo: { type: Boolean, required: true },
-});
+const imgError = ref(false)
 
-const mensajeFormateado = computed(() => {
-  if (props.msg === null || props.msg === undefined) {
-    return "/* no hay mensaje */"
-  }
-
-  if (props.msg.trim() === "") {
-    return "/* mensaje vacio */"
-  }
-
-  return props.msg
+const props = defineProps({
+  chat: { type: Object, required: true }
 })
 
-const imagenChat = ref(
-  `${import.meta.env.VITE_ARCHIVOS_URL}/${props.chatId}/0.${props.extensionImg || "jpg"}`
-)
-const imgPorDefecto = obtenerImgPorDefecto(props.esGrupo)
+const fechaUltimoMsg = computed(() => {
+  return props.chat.ultimoMensaje?.fechaEnvio ?? props.chat.fechaCreacion
+})
+
+const mensajeFormateado = computed(() => {
+  const msg = props.chat.ultimoMensaje?.mensaje
+
+  if (msg === null || msg === undefined) return "/* no hay mensaje */"
+  if (msg.trim() === "") return "/* mensaje vacio */"
+
+  return msg
+})
+
+const imagenChat = computed(() => {
+  if (imgError.value) return imgPorDefecto
+
+  if (props.chat.tipo === "CONVERSACION") {
+    return `${import.meta.env.VITE_ARCHIVOS_URL}/usuario/${props.chat.avatarConversacion}`
+  }
+
+  const ext = props.chat.extensionImagen || "jpg"
+  return `${import.meta.env.VITE_ARCHIVOS_URL}/${props.chat.id}/0.${ext}`
+})
+const imgPorDefecto = obtenerImgPorDefecto(props.chat.tipo === 'GRUPO')
 
 function formatearFecha(fechaMensaje) {
   const fechaHoy = new Date()
@@ -69,7 +73,6 @@ function formatearFecha(fechaMensaje) {
   // Si es más antiguo, mostramos la fecha completa en formato local
   return fechaDelMensaje.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
-
 </script>
 
 <!--  -->

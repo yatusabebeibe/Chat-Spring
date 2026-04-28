@@ -26,19 +26,33 @@ export const buscarIndexPorId = (lista, id) => {
   return lista.findIndex(item => item.id === id)
 }
 
+const esMasNuevo = (actual, nuevo) => {
+  if (!actual) return true
+  if (!nuevo) return false
+
+  const fechaActual = new Date(actual.fechaEnvio)
+  const fechaNuevo = new Date(nuevo.fechaEnvio)
+
+  return fechaNuevo > fechaActual
+}
+
+// export const mergeChats = (nuevosChats) => {
+//   nuevosChats.forEach((nuevo) => {
+//     const actual = mapaChats.value.get(nuevo.id)
+
+//     mapaChats.value.set(nuevo.id, {
+//       ...actual,
+//       ...nuevo,
+//       ultimoMensaje: esMasNuevo(actual?.ultimoMensaje, nuevo?.ultimoMensaje)
+//         ? nuevo.ultimoMensaje
+//         : actual?.ultimoMensaje
+//     })
+//   })
+// }
 export const mergeChats = (nuevosChats) => {
-  nuevosChats.forEach((nuevoChat) => {
-    const actual = mapaChats.value.get(nuevoChat.id)
-
-    if (!actual) {
-      mapaChats.value.set(nuevoChat.id, nuevoChat)
-      return
-    }
-
-    if (obtenerFechaChats(nuevoChat) > obtenerFechaChats(actual)) {
-      mapaChats.value.set(nuevoChat.id, nuevoChat)
-    }
-  })
+  mapaChats.value = new Map(
+    nuevosChats.map(chat => [chat.id, chat])
+  )
 }
 
 export const añadirMensajesPrincipio = (nuevosMensajes) => {

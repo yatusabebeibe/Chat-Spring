@@ -20,7 +20,7 @@ onBeforeMount(() => {
   cargarChats()
   conectarSocket()
 
-  listarIntervalo = setInterval(cargarChats, 15000)
+  listarIntervalo = setInterval(cargarChats, 5000)
 })
 
 onBeforeUnmount(() => {

@@ -1,5 +1,5 @@
 import { ref } from "vue"
-import { actualizarChatUltimoMensaje, añadirMensajesFinal, listaChats, mergeChats } from "./chat.js"
+import { actualizarChatUltimoMensaje, añadirMensajesFinal } from "./chat.js"
 
 export const socket = ref(null)
 
@@ -13,10 +13,6 @@ export const conectarSocket = () => {
 
   socket.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
-
-    if (data.type === "chat_update") {
-      mergeChats(listaChats.value, [data.chat])
-    }
 
     if (data.type === "MESSAGE_READY") {
       window.dispatchEvent(new CustomEvent("ws-message-ready", {

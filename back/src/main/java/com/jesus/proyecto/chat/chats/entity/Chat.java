@@ -82,4 +82,19 @@ public class Chat {
 
         return this.nombre;
     }
+
+    public String getAvatarConversacion(UUID idUsuario) {
+        if (this.tipo != TipoChat.CONVERSACION) {
+            return null;
+        }
+
+        for (UsuarioChat uc : this.miembros) {
+            Usuario u = uc.getUsuario();
+            if (!u.getId().equals(idUsuario)) {
+                return u.getId().toString();
+            }
+        }
+
+        return null;
+    }
 }

@@ -88,6 +88,9 @@ const textareaRef = ref(null)
 
 const imagenChat = computed(() => {
   const ext = chatActual.value?.extensionImagen || "jpg"
+  if (chatActual.value?.tipo === "CONVERSACION") {
+    return `${import.meta.env.VITE_ARCHIVOS_URL}/usuario/${chatActual.value.avatarConversacion}`
+  }
   return `${import.meta.env.VITE_ARCHIVOS_URL}/${route.params.chatId}/0.${ext}`
 })
 const imgPorDefecto = computed(() =>

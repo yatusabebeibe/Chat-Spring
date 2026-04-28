@@ -4,16 +4,14 @@ import java.io.Serializable;
 import java.util.UUID;
 
 import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Embeddable
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class I_ArchivoMensajeId implements Serializable {
 
     private UUID msgId;
