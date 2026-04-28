@@ -8,12 +8,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jesus.proyecto.chat._general.exceptions.MyAuthException;
 import com.jesus.proyecto.chat._general.utils.Paginacion;
 import com.jesus.proyecto.chat.relacionUsuarioChat.mapper.UsuarioChatMapper;
 import com.jesus.proyecto.chat.relacionUsuarioChat.service.UsuarioChatService;
@@ -63,6 +65,18 @@ public class UsuarioController {
         }
 
         return ResponseEntity.ok(usuarioService.obtenerTodos(pageable));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(Authentication auth) {
+
+        Usuario usuario = usuarioService.buscarPorUsuario(auth.getName());
+
+        if (usuario == null) {
+            throw new MyAuthException("Usuario no autenticado");
+        }
+
+        return ResponseEntity.ok(usuarioMapper.toResponseEspecifico(usuario));
     }
 
 }

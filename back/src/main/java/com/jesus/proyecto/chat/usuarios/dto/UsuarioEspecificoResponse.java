@@ -1,10 +1,12 @@
 package com.jesus.proyecto.chat.usuarios.dto;
 
+import java.time.Instant;
 import java.util.UUID;
+
 import lombok.Data;
 
 @Data
-public class UsuarioResponse {
+public class UsuarioEspecificoResponse {
 
     private UUID id;
 
@@ -14,4 +16,7 @@ public class UsuarioResponse {
 
     private String extensionAvatar;
 
+    private Instant fechaCreacion;
+
+    private Instant fechaUltimaConexion;
 }

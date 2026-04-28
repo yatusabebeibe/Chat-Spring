@@ -50,8 +50,8 @@ public class Usuario {
     @CreationTimestamp
     private Instant fechaUltimaConexion;
 
-    // @Column(length = 20)
-    // private String avatar; // diria que mejor usar la propia id del usuario
+    @Column(length = 5, nullable = true)
+    private String extensionAvatar;
 
     @OneToMany(mappedBy = "usuario")
     private List<UsuarioChat> chats;

@@ -6,7 +6,7 @@
         <MenuIconLink :to="{ name:'app' }" src="chat.svg" tooltip="Lista chats"/>
       </div>
       <div class="abajo">
-        <MenuIconLink :to="{ name:'login' }" src="usuario2.svg" />
+        <MenuIconLink :to="{ name:'me' }" src="usuario2.svg" />
         <MenuIconLink to="/ajustes" src="config.svg" />
       </div>
     </div>

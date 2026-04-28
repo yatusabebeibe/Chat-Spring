@@ -109,7 +109,7 @@ const cambiarImagen = async (e) => {
     return
   }
 
-  imagenChat.value = `${import.meta.env.VITE_ARCHIVOS_URL}/${route.params.chatId}?t=${Date.now()}`
+  imagenChat.value = `${import.meta.env.VITE_ARCHIVOS_URL}/${route.params.chatId}`
 }
 
 const formatoFecha = (fecha) => {

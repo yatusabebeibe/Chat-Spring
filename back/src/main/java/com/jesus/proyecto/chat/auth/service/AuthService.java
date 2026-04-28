@@ -74,10 +74,15 @@ public class AuthService {
         Usuario usuario = usuarioRepository.findByUsuario(authentication.getName())
                 .orElseThrow(() -> new MyAuthException("Usuario no encontrado"));
 
-        generarTokensYCookies(usuario, response);
-
         usuario.setFechaUltimaConexion(Instant.now());
+        System.out.println();
+        System.out.println();
+        System.out.println(usuario.getFechaUltimaConexion());
+        System.out.println();
+        System.out.println();
         usuarioRepository.save(usuario);
+
+        generarTokensYCookies(usuario, response);
 
         return crearResponse(usuario);
     }
