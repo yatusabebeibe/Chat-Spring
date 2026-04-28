@@ -16,6 +16,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import com.jesus.proyecto.chat.archivoMensaje.dto.ArchivoRequest;
+import com.jesus.proyecto.chat.archivoMensaje.utils.PathValidations;
 import com.jesus.proyecto.chat.mensajes.dto.SessionMessageState;
 
 import lombok.RequiredArgsConstructor;
@@ -86,7 +87,12 @@ public class WebSocketFileService {
             String nombreOriginal = meta.getNombre();
             String safeFilename = generarNombreSeguro(state, index, nombreOriginal);
 
-            Path path = Paths.get("uploads/" + state.getChatId() + "/" + safeFilename);
+            Path path = Paths.get(
+                PathValidations.BASE_UPLOAD,
+                PathValidations.CARPETA_CHATS,
+                state.getChatId().toString(),
+                safeFilename
+            );
 
             try {
                 Files.createDirectories(path.getParent());

@@ -120,4 +120,8 @@ public class ChatService {
 
         return chatMapper.toResponse(chat);
     }
+
+    public void guardar(Chat chat) {
+        chatRepository.save(chat);
+    }
 }

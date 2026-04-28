@@ -1,5 +1,5 @@
 <template>
-  <span class="error">{{ errorMsg }}</span>
+  <span class="error2">{{ errorMsg }}</span>
   <form @submit.prevent="registro" method="post">
 
     <Inputs

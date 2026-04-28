@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
-import com.jesus.proyecto.chat._general.websocket.utils.WebSocketAuthUtil;
 import com.jesus.proyecto.chat.chats.entity.Chat;
 import com.jesus.proyecto.chat.relacionUsuarioChat.service.UsuarioChatService;
 
@@ -24,7 +23,6 @@ public class WebSocketRoomService {
     private final Map<UUID, Set<WebSocketSession>> rooms = new ConcurrentHashMap<>();
 
     private final UsuarioChatService usuarioChatService;
-    private final WebSocketAuthUtil authUtil;
     private final WebSocketSessionService sessionService;
 
     // -------------------------
@@ -32,7 +30,7 @@ public class WebSocketRoomService {
     // -------------------------
     public void handleConnection(WebSocketSession session) {
         try {
-            UUID userId = authUtil.obtenerUsuario(session);
+            UUID userId = (UUID) session.getAttributes().get("userId");
 
             if (userId == null) {
                 return;

@@ -1,66 +1,79 @@
 <template>
-  <form id="formNewChat" @submit.prevent="handleSubmit" autocomplete="off">
-    
-    <!-- Selector -->
-    <select v-model="tipoChat">
-      <option disabled value="">Selecciona tipo</option>
-      <option value="grupo">Grupo</option>
-      <option value="conversacion">Conversacion</option>
-    </select>
+  <div class="container">
 
-    <!-- Si es grupo -->
-    <Inputs
-      v-if="tipoChat === 'grupo'"
-      v-model="nombreGrupo"
-      texto="Nombre del grupo"
-      name="nombreGrupo"
-      tipo="text"
-      :errorMsg="errorNombreGrupo"
-    />
+    <!-- FORM CREAR CHAT -->
+    <form id="formNewChat" class="card" @submit.prevent="handleSubmit" autocomplete="off">
+      
+      <h3>Crear chat</h3>
 
-    <!-- Si es conversacion -->
-    <div v-if="tipoChat === 'conversacion'">
+      <select v-model="tipoChat">
+        <option disabled value="">Selecciona tipo</option>
+        <option value="grupo">Grupo</option>
+        <option value="conversacion">Conversacion</option>
+      </select>
 
-      <!-- INPUT solo si NO hay usuario seleccionado -->
-      <div v-if="!usuarioSeleccionado">
-        <Inputs
-          v-model="usuario"
-          texto="¿Con que usuario?"
-          name="usuario"
-          tipo="text"
-          autocomplete="off"
-          :errorMsg="errorUsuario"
-        />
+      <Inputs
+        v-if="tipoChat === 'grupo'"
+        v-model="nombreGrupo"
+        texto="Nombre del grupo"
+        name="nombreGrupo"
+        tipo="text"
+        :errorMsg="errorNombreGrupo"
+      />
 
-        <!-- lista sugerencias -->
-        <ul v-if="usuariosEncontrados.length">
-          <li
-            v-for="u in usuariosEncontrados"
-            :key="u.id"
-            @click="seleccionarUsuario(u)"
-            style="cursor:pointer"
-          >
-            {{ u.nombre }} (@{{ u.usuario }})
-          </li>
-        </ul>
+      <div v-if="tipoChat === 'conversacion'">
+
+        <div v-if="!usuarioSeleccionado">
+          <Inputs
+            v-model="usuario"
+            texto="¿Con que usuario?"
+            name="usuario"
+            tipo="text"
+            autocomplete="off"
+            :errorMsg="errorUsuario"
+          />
+
+          <ul v-if="usuariosEncontrados.length" class="suggestions">
+            <li
+              v-for="u in usuariosEncontrados"
+              :key="u.id"
+              @click="seleccionarUsuario(u)"
+            >
+              {{ u.nombre }} (@{{ u.usuario }})
+            </li>
+          </ul>
+        </div>
+
+        <div v-else class="selected-user">
+          <span>
+            {{ usuarioSeleccionado.nombre }} (@{{ usuarioSeleccionado.usuario }})
+          </span>
+          <button type="button" @click="deseleccionarUsuario">X</button>
+        </div>
+
       </div>
 
-      <!-- USUARIO SELECCIONADO -->
-      <div v-else style="display:flex; align-items:center; gap:8px; position: relative;">
-        <span>
-          {{ usuarioSeleccionado.nombre }} (@{{ usuarioSeleccionado.usuario }})
-        </span>
+      <button v-if="tipoChat !== ''" type="submit">Crear</button>
+    </form>
 
-        <button type="button" @click="deseleccionarUsuario">X</button>
-        <span v-if="errorUsuario && usuarioSeleccionado" class="error">
-          {{ errorUsuario }}
-        </span>
-      </div>
-    </div>
 
-    <button v-if="tipoChat !== ''" type="submit">Crear</button>
+    <!-- FORM UNIRSE A GRUPO -->
+    <form class="card" @submit.prevent="handleJoinGroup">
+      
+      <h3>Unirse a grupo</h3>
 
-  </form>
+      <Inputs
+        v-model="codigoGrupo"
+        texto="Nombre o codigo del grupo"
+        name="codigoGrupo"
+        tipo="text"
+        :errorMsg="errorJoinGrupo"
+      />
+
+      <button type="submit">Unirse</button>
+    </form>
+
+  </div>
 </template>
 
 <script setup>
@@ -71,6 +84,9 @@ import { apiFetch, cargarChats } from '@/utils/api.js'
 const tipoChat = ref('')
 const nombreGrupo = ref('')
 const usuario = ref('')
+
+const codigoGrupo = ref('')
+const errorJoinGrupo = ref('')
 
 const usuariosEncontrados = ref([])
 const usuarioSeleccionado = ref(null)
@@ -86,7 +102,6 @@ watch(usuario, async (buscado) => {
   }
 
   let req = await apiFetch(`/usuario?buscar=${encodeURIComponent(buscado)}`)
-
   usuariosEncontrados.value = req.data
 })
 
@@ -95,31 +110,28 @@ const seleccionarUsuario = (u) => {
   usuarioSeleccionado.value = u
   usuariosEncontrados.value = []
 }
+
 const deseleccionarUsuario = () => {
   usuarioSeleccionado.value = null
   usuario.value = ''
   errorUsuario.value = ''
 }
 
+/* CREAR CHAT */
 async function handleSubmit() {
-  // reset errores
   errorNombreGrupo.value = ''
   errorUsuario.value = ''
 
   let hayError = false
 
-  if (tipoChat.value === 'grupo') {
-    if (!nombreGrupo.value.trim()) {
-      errorNombreGrupo.value = 'El nombre es obligatorio'
-      hayError = true
-    }
+  if (tipoChat.value === 'grupo' && !nombreGrupo.value.trim()) {
+    errorNombreGrupo.value = 'El nombre es obligatorio'
+    hayError = true
   }
 
-  if (tipoChat.value === 'conversacion') {
-    if (!usuarioSeleccionado.value) {
-      errorUsuario.value = 'Selecciona un usuario valido'
-      hayError = true
-    }
+  if (tipoChat.value === 'conversacion' && !usuarioSeleccionado.value) {
+    errorUsuario.value = 'Selecciona un usuario valido'
+    hayError = true
   }
 
   if (hayError) return
@@ -134,20 +146,133 @@ async function handleSubmit() {
 
   const res = await apiFetch("/chat", payload, "POST")
 
-  if (!res.ok) {
-    console.log(res);
-    
-    if (res.data?.error.nombre) {errorNombreGrupo.value = res.data?.error.nombre}
-    if (res.data?.error.conversacion) {errorUsuario.value = res.data?.error.conversacion}
-    return
-  }
+  if (!res.ok) return
 
   cargarChats()
 
-  // reset
   tipoChat.value = ''
   nombreGrupo.value = ''
   usuario.value = ''
   usuarioSeleccionado.value = null
 }
+
+/* UNIRSE A GRUPO */
+async function handleJoinGroup() {
+  errorJoinGrupo.value = ''
+
+  if (!codigoGrupo.value.trim()) {
+    errorJoinGrupo.value = 'Introduce un grupo'
+    return
+  }
+
+  const res = await apiFetch("/chat/unirse", {
+    grupo: codigoGrupo.value
+  }, "POST")
+
+  if (!res.ok) {
+    errorJoinGrupo.value = res.data?.error || 'Error al unirse'
+    return
+  }
+
+  cargarChats()
+  codigoGrupo.value = ''
+}
 </script>
+
+<style scoped>
+.container{
+  display: grid;
+  gap: 18px;
+  /* max-width: 520px; */
+
+  justify-content: center; /* centra horizontal */
+  align-content: center;   /* centra vertical dentro del espacio disponible */
+
+  min-height: 100vh;       /* ocupa toda la pantalla */
+}
+
+/* CARD igual estilo mensaje */
+.card{
+  border: 1px solid #aaa;
+  padding: 15px 25px;
+  border-radius: 6px;
+  width: 350px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* TITULOS igual que header (simple y suave) */
+h3{
+  margin: 0;
+  font-size: 12px;
+  color: lightgray;
+  font-weight: normal;
+}
+
+/* INPUTS / SELECT estilo limpio */
+select,
+input{
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 12px;
+}
+
+/* BOTONES estilo mensaje */
+button{
+  margin-top: 16px;
+  font-size: 12px;
+
+  border: 1px solid #aaa;
+  background: white;
+  border-radius: 6px;
+
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+button:hover{
+  background: #f5f5f5;
+}
+
+/* BOTÓN DESDELECCIONAR (X) más compacto */
+.selected-user button{
+  margin-top: 0;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+/* USUARIO SELECCIONADO estilo “resumen / file” */
+.selected-user{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 8px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+}
+
+/* SUGGESTIONS estilo lista simple */
+.suggestions{
+  list-style: none;
+  margin: 0;
+  margin-top: 1.1rem;
+  padding: 0;
+
+  border: 1px solid #aaa;
+  border-radius: 6px;
+}
+
+.suggestions li{
+  padding: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.suggestions li:hover{
+  background: #f5f5f555;
+}
+</style>

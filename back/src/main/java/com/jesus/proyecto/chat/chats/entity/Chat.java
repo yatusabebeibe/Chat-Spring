@@ -62,6 +62,8 @@ public class Chat {
     @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY)
     private List<UsuarioChat> miembros;
 
+    @Column(length = 5, nullable = true)
+    private String extensionImagen;
 
     @OneToMany(mappedBy = "chat", fetch = FetchType.LAZY)
     private List<Mensaje> mensajes;

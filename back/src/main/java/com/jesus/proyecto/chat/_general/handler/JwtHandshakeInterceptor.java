@@ -1,16 +1,25 @@
 package com.jesus.proyecto.chat._general.handler;
 
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
-import jakarta.servlet.http.HttpServletRequest;
+import com.jesus.proyecto.chat.auth.service.JwtService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+
+@Component
+@RequiredArgsConstructor
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
+
+    private final JwtService jwtService;
 
     @Override
     public boolean beforeHandshake(
@@ -24,12 +33,17 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
         String cookies = servletRequest.getHeader("cookie");
 
-        if (cookies != null) {
-            for (String cookie : cookies.split(";")) {
-                String[] parts = cookie.trim().split("=");
+        if (cookies == null) return true;
 
-                if (parts.length == 2 && parts[0].equals("jwt")) {
-                    attributes.put("jwt", parts[1]);
+        for (String cookie : cookies.split(";")) {
+            String[] parts = cookie.trim().split("=");
+
+            if (parts.length == 2 && parts[0].equals("accessToken")) {
+                try {
+                    UUID userId = jwtService.extraerUsuarioId(parts[1]);
+                    attributes.put("userId", userId);
+                } catch (Exception e) {
+                    System.out.println("JWT inválido");
                 }
             }
         }

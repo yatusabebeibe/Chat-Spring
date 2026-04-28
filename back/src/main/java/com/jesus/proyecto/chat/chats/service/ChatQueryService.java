@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.jesus.proyecto.chat.chats.dto.ChatListResponse;
 import com.jesus.proyecto.chat.chats.entity.Chat;
+import com.jesus.proyecto.chat.chats.mapper.ChatMapper;
 import com.jesus.proyecto.chat.chats.repository.ChatRepository;
 import com.jesus.proyecto.chat.chats.utils.TipoChat;
 import com.jesus.proyecto.chat.mensajes.entity.Mensaje;
@@ -24,19 +25,20 @@ public class ChatQueryService {
     private final UsuarioChatRepository usuarioChatRepository;
     private final MensajeRepository mensajeRepository;
     private final MensajeMapper mensajeMapper;
+    private final ChatMapper chatMapper;
 
     private ChatListResponse crearResponse(Chat chat) {
+        ChatListResponse response = chatMapper.toListResponse(chat);
+
         Mensaje ultimo = mensajeRepository
                 .findFirstByChatIdAndEliminadoFalseOrderByFechaEnvioDesc(chat.getId())
                 .orElse(null);
 
-        ChatListResponse response = new ChatListResponse();
-        response.setId(chat.getId());
-        response.setNombre(chat.getNombre());
-        response.setTipo(chat.getTipo());
-        response.setUltimoMensaje(mensajeMapper.toResponseSinArchivos(ultimo));
-        response.setIdCreador(chat.getCreador().getId());
-        response.setFechaCreacion(chat.getFechaCreacion());
+        response.setUltimoMensaje(
+            ultimo != null ?
+                mensajeMapper.toResponseSinArchivos(ultimo) :
+                null
+        );
 
         return response;
     }

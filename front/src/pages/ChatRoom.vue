@@ -8,13 +8,13 @@
         ← App
       </RouterLink>
 
-      <div class="chat-info">
-        <img class="chat-avatar" :src="avatarUrl" />
+      <RouterLink :to="{ name: 'chatDetails' }" class="chat-info">
+        <img class="chat-avatar" :src="imagenChat" @error="e => e.target.src = imgPorDefecto" />
 
         <span class="chat-title">
-          {{ tituloChat }}
+          {{ chatActual?.nombre }}
         </span>
-      </div>
+      </RouterLink>
 
       <MenuIconButon
         src="menu.png"
@@ -72,22 +72,27 @@
 <script setup>
 import Mensaje from "@/components/Mensaje.vue"
 import MenuIconButon from "@/components/MenuIconButon.vue"
-import { cargarMensajesChats } from "@/utils/api.js"
-import { listaMensajesChatActual } from "@/utils/chat.js"
+import { cargarMensajesChats, obtenerImgPorDefecto } from "@/utils/api.js"
+import { getChatActual, listaMensajesChatActual } from "@/utils/chat.js"
 import { socket } from "@/utils/ws.js"
-import { nextTick, onBeforeMount, onBeforeUnmount, ref } from "vue"
+import { computed, nextTick, onBeforeMount, onBeforeUnmount, ref } from "vue"
 import { onBeforeRouteUpdate, useRoute } from "vue-router"
 
 const route = useRoute()
+const chatActual = computed(() => getChatActual(route.params.chatId).value)
 
 const chatMain = ref(null)
 
 const texto = ref("")
-const archivos = ref([])
 const textareaRef = ref(null)
 
-const tituloChat = ref("Chat")
-const avatarUrl = ref("/default.png")
+const imagenChat = computed(() => {
+  const ext = chatActual.value?.extensionImagen || "jpg"
+  return `${import.meta.env.VITE_ARCHIVOS_URL}/${route.params.chatId}/0.${ext}`
+})
+const imgPorDefecto = computed(() =>
+  obtenerImgPorDefecto(chatActual.value?.tipo === "GRUPO")
+)
 
 const pendingFiles = ref([])
 

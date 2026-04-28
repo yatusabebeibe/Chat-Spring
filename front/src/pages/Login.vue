@@ -1,5 +1,5 @@
 <template>
-  <span class="error">{{ errorMsg }}</span>
+  <span class="error2">{{ errorMsg }}</span>
   <form @submit.prevent="login" method="post">
 
     <Inputs
@@ -45,9 +45,3 @@ async function login() {
   }
 }
 </script>
-
-<style lang="css">
-.error {
-  color: rgb(255, 128, 128);
-}
-</style>

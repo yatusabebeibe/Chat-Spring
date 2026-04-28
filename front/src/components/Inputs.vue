@@ -67,9 +67,8 @@ watch(() => props.modelValue, (nuevo) => {
 .inputElement > span.error {
   position: absolute;
   top: 100%;
-  color: rgb(255, 128, 128);
-  font-weight: bolder;
-  font-size: .7rem;
+  display: block;
+  width: 100%;
 }
 
 input:not([type="submit"]) {

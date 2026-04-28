@@ -5,14 +5,14 @@
   >
     <!-- <img src="/favicon.ico" alt=""> -->
     <img 
-      :src="imagenActual ?? imgPorDefecto" 
-      @error="imagenActual = imgPorDefecto"
+      :src="imagenChat" 
+      @error="imagenChat = imgPorDefecto"
       alt=""
     />
     <div>
       <h3>{{ props.titulo }}</h3>
       <span>{{ formatearFecha(props.fechaUltimoMsg) }}</span>
-      <p>{{ props.msg.trim().length > 1 ? props.msg : "/* vacio */" }}</p>
+      <p>{{ mensajeFormateado }}</p>
     </div>
   </RouterLink>
 </template>
@@ -20,6 +20,7 @@
 <!--  -->
 
 <script setup>
+import { obtenerImgPorDefecto } from '@/utils/api.js';
 import { computed, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 
@@ -28,14 +29,26 @@ const props =  defineProps({
   chatId: { type: String, required: true },
   titulo: { type: String, required: true },
   msg: { type: String, required: true },
-  img: { type: String, required: false },
+  extensionImg: { type: String, required: false },
   esGrupo: { type: Boolean, required: true },
 });
 
+const mensajeFormateado = computed(() => {
+  if (props.msg === null || props.msg === undefined) {
+    return "/* no hay mensaje */"
+  }
 
-const imagenActual = ref(props.img)
-// const imgPorDefecto = props.esGrupo ? "/grupo.png" : "/conversacion.png"
-const imgPorDefecto = props.esGrupo ? "/icons/chat/grupos.svg" : "/icons/chat/conversaciones.svg"
+  if (props.msg.trim() === "") {
+    return "/* mensaje vacio */"
+  }
+
+  return props.msg
+})
+
+const imagenChat = ref(
+  `${import.meta.env.VITE_ARCHIVOS_URL}/${props.chatId}/0.${props.extensionImg || "jpg"}`
+)
+const imgPorDefecto = obtenerImgPorDefecto(props.esGrupo)
 
 function formatearFecha(fechaMensaje) {
   const fechaHoy = new Date()

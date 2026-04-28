@@ -6,11 +6,26 @@
 <script setup>
 import BarraLateral from '@/layouts/BarraLateral.vue';
 import Contenido from '@/layouts/Contenido.vue';
-import { ref } from 'vue';
+import { cargarChats } from '@/utils/api.js';
+import { conectarSocket } from '@/utils/ws.js';
+import { onBeforeMount, onBeforeUnmount, ref } from 'vue';
 
 const pagsBarraLateral = ref([
   "app", "config"
 ])
+
+let listarIntervalo
+
+onBeforeMount(() => {
+  cargarChats()
+  conectarSocket()
+
+  listarIntervalo = setInterval(cargarChats, 15000)
+})
+
+onBeforeUnmount(() => {
+  clearInterval (listarIntervalo)
+})
 </script>
 
 <style scoped>

@@ -196,7 +196,9 @@ public class AuthService {
     }
 
     private Cookie generarRefreshCookie(String token) {
-        return generarCookie("refreshToken", token, jwtConfig.getRefreshExpiration());
+        Cookie cookie = generarCookie("refreshToken", token, jwtConfig.getRefreshExpiration());
+        cookie.setPath("/api/auth/refresh");
+        return cookie;
     }
 
     private Cookie generarCookie(String nombre, String token, long edad) {

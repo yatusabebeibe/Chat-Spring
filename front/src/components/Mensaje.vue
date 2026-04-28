@@ -7,16 +7,16 @@
     </div>
 
     <div class="body">
-      <div style="position: relative;">
+      <div v-if="mensaje.mensaje" style="position: relative;">
         <div class="mensaje-texto" v-if="mensaje.mensaje">
           {{ mensaje.mensaje }}
         </div>
 
         <!-- RESUMEN -->
-        <div v-if="mensaje.resumen" class="resumen">
-          <strong>Resumen:</strong>
+        <fieldset v-if="mensaje.resumen" class="resumen">
+          <legend>Resumen:</legend>
           <p>{{ mensaje.resumen }}</p>
-        </div>
+        </fieldset>
 
         <button @click="resumirMensaje">
           Resumir
@@ -139,5 +139,18 @@ function formatDate(date) {
 button {
   margin-top: 5px;
   font-size: 12px;
+}
+
+.resumen {
+  border: 1px solid #ddd;
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 6px;
+}
+
+.resumen legend {
+  font-size: .8rem;
+  font-weight: bold;
+  padding: 0 6px;
 }
 </style>

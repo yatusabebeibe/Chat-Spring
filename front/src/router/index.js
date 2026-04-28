@@ -10,6 +10,7 @@ import ListaChats from "@/components/ListaChats.vue";
 import Contenido from "@/layouts/Contenido.vue";
 import ChatRoom from "@/pages/ChatRoom.vue";
 import NewChat from "@/pages/NewChat.vue";
+import ChatDetalles from "@/pages/ChatDetalles.vue";
 
 const router = createRouter({
   history: createWebHistory( import.meta.env.BASE_URL ),
@@ -30,6 +31,7 @@ const router = createRouter({
         { path: "", component: EstructuraApp, children: [
           { name: "app", path: "", components: {lateral: ListaChats, default: Contenido}, children: [ // app
             { name: "chatRoom", path: "chat/:chatId", components: {default: ChatRoom} },
+            { name: "chatDetails", path: "chat/:chatId/detalles", components: {default: ChatDetalles} },
             { name: "newChat", path: "chat/new", components: {default: NewChat} },
           ] },
         ] },

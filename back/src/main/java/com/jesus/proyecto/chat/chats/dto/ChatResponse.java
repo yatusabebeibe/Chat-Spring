@@ -22,5 +22,7 @@ public class ChatResponse {
 
     private UUID idCreador;
 
+    private String extensionImagen; // puede ser null
+
     private Instant fechaCreacion;
 }

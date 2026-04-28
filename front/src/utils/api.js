@@ -1,6 +1,6 @@
 import { chatConfig } from "@/config.js"
 import router from "@/router/index.js"
-import { añadirMensajesFinal, añadirMensajesPrincipio, listaMensajesChatActual, mergeChats } from '@/utils/chat.js'
+import { listaMensajesChatActual, mergeChats } from '@/utils/chat.js'
 
 
 // funcion base sin logica de retry
@@ -56,6 +56,33 @@ export async function apiFetch(url, body = null, method = "GET") {
   return res
 }
 
+export async function apiFetchArchivos(url, file, method = "POST") {
+  try {
+    const formData = new FormData()
+    formData.append("file", file)
+
+    const res = await fetch(import.meta.env.VITE_ARCHIVOS_URL + url, {
+      method: method,
+      body: formData,
+      credentials: "include",
+    })
+
+    const data = await res.text() // tu backend devuelve string
+
+    return {
+      ok: res.ok,
+      status: res.status,
+      data
+    }
+  } catch (error) {
+    return {
+      ok: false,
+      status: 500,
+      data: "Error del servidor"
+    }
+  }
+}
+
 export const cargarChats = async () => {
   const res = await apiFetch('/chat')
 
@@ -72,8 +99,15 @@ export const cargarMensajesChats = async (chatId) => {
 
   if (!res.ok) {
     console.error('Error cargando mensajes', res.data)
+    router.push({name: "app"})
     return
   }
 
   listaMensajesChatActual.value = res.data;
+}
+
+export const obtenerImgPorDefecto = (esGrupo) => {
+  return esGrupo
+    ? "/icons/chat/grupos.svg"
+    : "/icons/chat/conversaciones.svg"
 }
