@@ -20,7 +20,6 @@ const cargarUsuarios = async (chatId) => {
   res.data.forEach(usr => {
     mapaUsuariosChatActual.value.set(usr.id, usr)
   })
-  console.log(res.data);
 }
 
 onBeforeMount(async () => {

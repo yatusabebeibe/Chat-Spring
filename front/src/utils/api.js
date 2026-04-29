@@ -35,8 +35,7 @@ async function rawFetch(url, body = null, method = "GET") {
 export async function apiFetch(url, body = null, method = "GET") {
   const res = await rawFetch(url, body, method)
 
-  console.log("fech 1", res);
-  
+  // console.log("fech 1", res);
 
   if (res.data?.error === "Necesitas autenticarte") {
     const refresh = await rawFetch("/auth/refresh", null, "POST")

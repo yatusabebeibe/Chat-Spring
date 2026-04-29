@@ -7,6 +7,15 @@
     </div>
 
     <div class="body">
+      <!-- PREVIEW RESPUESTA -->
+      <div v-if="mensajeRespuesta" class="respuesta-preview">
+        <div class="respuesta-user">
+          {{ getUsuarioRespuesta }}
+        </div>
+        <div class="respuesta-texto">
+          {{ mensajeRespuesta.mensaje || '[archivo]' }}
+        </div>
+      </div>
       <div v-if="mensaje.mensaje" style="position: relative;">
         <div class="mensaje-texto" v-if="mensaje.mensaje">
           {{ mensaje.mensaje }}
@@ -67,13 +76,25 @@ import { mapaUsuariosChatActual } from '@/utils/chat.js'
 import { computed } from 'vue'
 
 const props = defineProps({
-  mensaje: Object
+  mensaje: Object,
+  mensajeRespuesta: {
+    type: Object,
+    required: false,
+    default: null
+  }
 })
 
 const usuaioMsg = computed(() =>{
   const usuario = mapaUsuariosChatActual.value.get(props.mensaje.usuarioId)
   if (usuario?.nombre && usuario?.usuario) {
     return`${usuario.nombre} (@${usuario.usuario})`
+  }
+  return ""
+})
+const getUsuarioRespuesta = computed(() => {
+  const usuario = mapaUsuariosChatActual.value.get(props.mensajeRespuesta?.usuarioId)
+  if (usuario?.nombre && usuario?.usuario) {
+    return `${usuario.nombre} (@${usuario.usuario})`
   }
   return ""
 })
@@ -121,8 +142,6 @@ async function responderIA() {
 }
 
 function getUrl(url) {
-  console.log(url);
-  console.log(url.split('/').pop());
   return `${import.meta.env.VITE_ARCHIVOS_URL}/${props.mensaje.chatId}/${url}`
 }
 
@@ -212,5 +231,34 @@ button {
   font-size: .8rem;
   font-weight: bold;
   padding: 0 6px;
+}
+.respuesta-preview {
+  border-left: 3px solid #4caf50;
+  padding-left: 6px;
+  margin-bottom: 6px;
+  opacity: 0.85;
+}
+
+.respuesta-user {
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: #aaa;
+}
+
+.respuesta-texto {
+  font-size: 0.72rem;
+  color: rgb(222, 222, 222);
+  font-weight: 300;
+
+  line-height: 1rem;
+  max-height: 2rem;
+  overflow: hidden;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 </style>

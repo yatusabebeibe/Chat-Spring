@@ -60,11 +60,11 @@ public class MensajeService {
     }
 
     public List<Mensaje> getInitial(UUID chatId, int size) {
-        Sort orden = Sort.by(Direction.ASC, "id");
+        Sort orden = Sort.by(Direction.DESC, "id");
         return mensajeRepository.findByChatIdAndEliminadoFalse(
             chatId,
             PageRequest.of(0, size, orden)
-        );
+        ).reversed();
     }
 
     public List<Mensaje> getOlder(UUID chatId, UUID cursor, int size) {
@@ -72,7 +72,7 @@ public class MensajeService {
             chatId,
             cursor,
             PageRequest.of(0, size)
-        );
+        ).reversed();
     }
 
     public List<Mensaje> getNewer(UUID chatId, UUID cursor, int size) {

@@ -58,18 +58,18 @@ export const mergeChats = (nuevosChats) => {
 export const añadirMensajesPrincipio = (nuevosMensajes) => {
   if (!Array.isArray(nuevosMensajes)) return
 
-  listaMensajesChatActual.value = [
-    ...nuevosMensajes,
-    ...listaMensajesChatActual.value
-  ].slice(0, chatConfig.MAX_MENSAJES)
+  const actuales = listaMensajesChatActual.value
+
+  let merged = [...nuevosMensajes, ...actuales]
+  listaMensajesChatActual.value = merged
 }
 export const añadirMensajesFinal = (nuevosMensajes) => {
   if (!Array.isArray(nuevosMensajes)) return
 
-  listaMensajesChatActual.value = [
-    ...listaMensajesChatActual.value,
-    ...nuevosMensajes
-  ].slice(-chatConfig.MAX_MENSAJES)
+  const actuales = listaMensajesChatActual.value.map(m => ({ ...m }))
+
+    let merged = [...actuales, ...nuevosMensajes]
+  listaMensajesChatActual.value = merged
 }
 
 export const actualizarChatUltimoMensaje = (mensaje) => {

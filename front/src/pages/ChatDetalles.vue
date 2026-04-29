@@ -177,9 +177,6 @@ const agregarUsuario = async () => {
     "POST"
   )
 
-  console.log("aaaaaaaaaaa", res);
-  
-
   if (!res.ok) {
     userSearch.value?.setError(res.data?.error || 'Error al añadir usuario')
     return
