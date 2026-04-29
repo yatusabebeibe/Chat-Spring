@@ -1,7 +1,7 @@
 import { chatConfig } from "@/config.js"
 import { computed, ref } from "vue"
 
-const mapaChats = ref(new Map())
+export const mapaChats = ref(new Map())
 export const listaMensajesChatActual = ref([])
 export const mapaUsuariosChatActual = ref(new Map())
 

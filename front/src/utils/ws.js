@@ -1,5 +1,5 @@
 import { ref } from "vue"
-import { actualizarChatUltimoMensaje, añadirMensajesFinal } from "./chat.js"
+import { actualizarChatUltimoMensaje, añadirMensajesFinal, listaMensajesChatActual, mapaChats } from "./chat.js"
 
 export const socket = ref(null)
 

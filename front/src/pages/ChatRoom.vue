@@ -151,7 +151,6 @@ const enviar = () => {
 
   socket.value.send(JSON.stringify(payload))
 
-  pendingFiles.value = []
   texto.value = ""
   respuestaActiva.value = null
 }
@@ -228,6 +227,18 @@ const autoResize = () => {
 const eliminarArchivo = (index) => {
   pendingFiles.value.splice(index, 1)
 }
+
+window.addEventListener("ws-message-ready", async () => {
+  console.log("--- llega ---");
+  
+  for (const file of pendingFiles.value) {
+    const buffer = await file.arrayBuffer()
+    socket.value.send(buffer)
+  }
+
+  pendingFiles.value = []
+  texto.value = ""
+})
 
 onBeforeMount(async () => {
   await cargarMensajesChats(route.params.chatId)
