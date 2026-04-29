@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.jesus.proyecto.chat._general.exceptions.ChatNoEncontradoException;
 import com.jesus.proyecto.chat._general.exceptions.MismoUsuarioException;
 import com.jesus.proyecto.chat._general.exceptions.UsuarioNoEncontradoException;
+import com.jesus.proyecto.chat._general.exceptions.UsuarioYaEstaEnGrupoException;
 import com.jesus.proyecto.chat.chats.entity.Chat;
 import com.jesus.proyecto.chat.chats.repository.ChatRepository;
 import com.jesus.proyecto.chat.chats.utils.TipoChat;
@@ -38,10 +39,12 @@ public class UsuarioChatService {
             }
         }
 
-        if (!usuarioChatRepository.existsById_IdUsuarioAndId_IdChat(usr.getId(), chat.getId())) {
-            UsuarioChat usrChat = UsuarioChat.crear(usr, chat, rol);
-            usuarioChatRepository.save(usrChat);
+        if (usuarioChatRepository.existsById_IdUsuarioAndId_IdChat(usr.getId(), chat.getId())) {
+            throw new UsuarioYaEstaEnGrupoException();
         }
+
+        UsuarioChat usrChat = UsuarioChat.crear(usr, chat, rol);
+        usuarioChatRepository.save(usrChat);
     }
 
     public void agregarUsuarios(Chat chat, Usuario... usuarios) {

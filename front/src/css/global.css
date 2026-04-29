@@ -69,6 +69,11 @@ body > header > div {
 
 body > header > * { height: 100%; }
 
+.anim { transition: all 0.2s; }
+
+.scale6 { cursor: pointer; }
+.scale6:hover { transform: scale(1.6); }
+
 .icon {
   display: inline-block;
   max-height: 55px; min-height: 40px;

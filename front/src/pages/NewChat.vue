@@ -2,7 +2,7 @@
   <div class="container">
 
     <!-- FORM CREAR CHAT -->
-    <form id="formNewChat" class="card" @submit.prevent="handleSubmit" autocomplete="off">
+    <form class="card" @submit.prevent="handleSubmit" autocomplete="off">
       
       <h3>Crear chat</h3>
 
@@ -21,37 +21,11 @@
         :errorMsg="errorNombreGrupo"
       />
 
-      <div v-if="tipoChat === 'conversacion'">
-
-        <div v-if="!usuarioSeleccionado">
-          <Inputs
-            v-model="usuario"
-            texto="¿Con que usuario?"
-            name="usuario"
-            tipo="text"
-            autocomplete="off"
-            :errorMsg="errorUsuario"
-          />
-
-          <ul v-if="usuariosEncontrados.length" class="suggestions">
-            <li
-              v-for="u in usuariosEncontrados"
-              :key="u.id"
-              @click="seleccionarUsuario(u)"
-            >
-              {{ u.nombre }} (@{{ u.usuario }})
-            </li>
-          </ul>
-        </div>
-
-        <div v-else class="selected-user">
-          <span>
-            {{ usuarioSeleccionado.nombre }} (@{{ usuarioSeleccionado.usuario }})
-          </span>
-          <button type="button" @click="deseleccionarUsuario">X</button>
-        </div>
-
-      </div>
+      <BusquedaUsuarios
+        v-if="tipoChat === 'conversacion'"
+        ref="userSearch"
+        texto="¿Con que usuario?"
+      />
 
       <button v-if="tipoChat !== ''" type="submit">Crear</button>
     </form>
@@ -76,51 +50,25 @@
   </div>
 </template>
 
+
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import Inputs from '@/components/Inputs.vue'
+import BusquedaUsuarios from '@/components/BusquedaUsuarios.vue'
 import { apiFetch, cargarChats } from '@/utils/api.js'
 
 const tipoChat = ref('')
 const nombreGrupo = ref('')
-const usuario = ref('')
-
 const codigoGrupo = ref('')
-const errorJoinGrupo = ref('')
-
-const usuariosEncontrados = ref([])
-const usuarioSeleccionado = ref(null)
 
 const errorNombreGrupo = ref('')
-const errorUsuario = ref('')
+const errorJoinGrupo = ref('')
 
-watch(usuario, async (buscado) => {
-  errorUsuario.value = ''
-  if (!buscado) {
-    usuariosEncontrados.value = []
-    return
-  }
-
-  let req = await apiFetch(`/usuario?buscar=${encodeURIComponent(buscado)}`)
-  usuariosEncontrados.value = req.data
-})
-
-const seleccionarUsuario = (u) => {
-  usuario.value = u.usuario
-  usuarioSeleccionado.value = u
-  usuariosEncontrados.value = []
-}
-
-const deseleccionarUsuario = () => {
-  usuarioSeleccionado.value = null
-  usuario.value = ''
-  errorUsuario.value = ''
-}
+const userSearch = ref(null)
 
 /* CREAR CHAT */
 async function handleSubmit() {
   errorNombreGrupo.value = ''
-  errorUsuario.value = ''
 
   let hayError = false
 
@@ -129,18 +77,23 @@ async function handleSubmit() {
     hayError = true
   }
 
-  if (tipoChat.value === 'conversacion' && !usuarioSeleccionado.value) {
-    errorUsuario.value = 'Selecciona un usuario valido'
-    hayError = true
+  if (tipoChat.value === 'conversacion') {
+    const usuario = userSearch.value?.usuarioSeleccionado
+
+    if (!usuario) {
+      hayError = true
+    }
   }
 
   if (hayError) return
+
+  const usuario = userSearch.value?.usuarioSeleccionado
 
   const payload = {
     nombre: tipoChat.value === 'grupo' ? nombreGrupo.value : null,
     tipo: tipoChat.value === 'grupo' ? 'GRUPO' : 'CONVERSACION',
     idParticipante: tipoChat.value === 'conversacion'
-      ? usuarioSeleccionado.value.id
+      ? usuario.id
       : null
   }
 
@@ -152,8 +105,6 @@ async function handleSubmit() {
 
   tipoChat.value = ''
   nombreGrupo.value = ''
-  usuario.value = ''
-  usuarioSeleccionado.value = null
 }
 
 /* UNIRSE A GRUPO */
@@ -178,6 +129,7 @@ async function handleJoinGroup() {
   codigoGrupo.value = ''
 }
 </script>
+
 
 <style scoped>
 .container{
@@ -235,44 +187,5 @@ button{
 
 button:hover{
   background: #f5f5f5;
-}
-
-/* BOTÓN DESDELECCIONAR (X) más compacto */
-.selected-user button{
-  margin-top: 0;
-  padding: 2px 6px;
-  font-size: 12px;
-}
-
-/* USUARIO SELECCIONADO estilo “resumen / file” */
-.selected-user{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  padding: 8px;
-  border: 1px solid #aaa;
-  border-radius: 6px;
-}
-
-/* SUGGESTIONS estilo lista simple */
-.suggestions{
-  list-style: none;
-  margin: 0;
-  margin-top: 1.1rem;
-  padding: 0;
-
-  border: 1px solid #aaa;
-  border-radius: 6px;
-}
-
-.suggestions li{
-  padding: 8px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.suggestions li:hover{
-  background: #f5f5f555;
 }
 </style>

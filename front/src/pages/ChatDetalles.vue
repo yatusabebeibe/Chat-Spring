@@ -56,26 +56,46 @@
     </div>
 
     <div class="usuarios">
-      <h3>Miembros</h3>
+      <div class="miembros-header">
+        <h3>Miembros</h3>
+        <span class="add-btn anim scale6" @click="modoAgregar = !modoAgregar">
+          +
+        </span>
+      </div>
 
-      <div
-        v-for="[id, usuario] in usuarios"
-        :key="id"
-        class="usuario"
-      >
-        <p class="nombre">
-          {{ usuario.nombre }}
+      <!-- LISTA -->
+      <div v-if="!modoAgregar">
+        <div
+          v-for="[id, usuario] in usuarios"
+          :key="id"
+          class="usuario"
+        >
+          <p class="nombre">
+            {{ usuario.nombre }}
 
-          <span v-if="usuario.rol === 'ADMIN'" class="badge admin">
-            Admin
-          </span>
+            <span v-if="usuario.rol === 'ADMIN'" class="badge admin">
+              Admin
+            </span>
 
-          <span v-if="id === chatActual.idCreador && isGrupo" class="badge creador">
-            Creador
-          </span>
-        </p>
+            <span v-if="id === chatActual.idCreador && isGrupo" class="badge creador">
+              Creador
+            </span>
+          </p>
 
-        <span class="nick">@{{ usuario.usuario }}</span>
+          <span class="nick">@{{ usuario.usuario }}</span>
+        </div>
+      </div>
+
+      <!-- BUSCADOR -->
+      <div v-else class="add-user">
+        <BusquedaUsuarios
+          ref="userSearch"
+          texto="Buscar usuario"
+        /><br>
+
+        <button class="añadir" @click="agregarUsuario">
+          Añadir
+        </button>
       </div>
     </div>
 
@@ -86,11 +106,15 @@
 </template>
 
 <script setup>
+import BusquedaUsuarios from "@/components/BusquedaUsuarios.vue"
 import Inputs from "@/components/Inputs.vue"
-import { apiFetchArchivos, obtenerImgPorDefecto, apiFetch } from "@/utils/api.js"
+import { apiFetch, apiFetchArchivos, obtenerImgPorDefecto } from "@/utils/api.js"
 import { getChatActual, mapaUsuariosChatActual } from "@/utils/chat.js"
-import { computed, ref, onMounted, onBeforeUnmount } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
+
+const modoAgregar = ref(false)
+const userSearch = ref(null)
 
 const route = useRoute()
 const fileInput = ref(null)
@@ -138,6 +162,30 @@ const cambiarImagen = async (e) => {
   }
 
   imagenChat.value = `${import.meta.env.VITE_ARCHIVOS_URL}/${route.params.chatId}`
+}
+
+const agregarUsuario = async () => {
+  const usuario = userSearch.value?.usuarioSeleccionado
+  if (!usuario) {
+    userSearch.value?.setError('Selecciona un usuario')
+    return
+  }
+
+  const res = await apiFetch(
+    `/chat/${chatActual.value.id}?usuarioId=${usuario.id}`,
+    null,
+    "POST"
+  )
+
+  console.log("aaaaaaaaaaa", res);
+  
+
+  if (!res.ok) {
+    userSearch.value?.setError(res.data?.error || 'Error al añadir usuario')
+    return
+  }
+
+  modoAgregar.value = false
 }
 
 /* FECHA */
@@ -216,7 +264,6 @@ onBeforeUnmount(() => {
 
 .nombre {
   margin: 10px 0 0;
-  cursor: pointer;
 }
 
 .tipo {
@@ -290,5 +337,28 @@ button {
 .salir {
   background: #ff4d4d;
   color: white;
+}
+
+.añadir {
+  background: #4d8aff;
+  color: white;
+}
+.miembros-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-btn{
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0 8px;
+  user-select: none;
+}
+
+.add-user{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 </style>
