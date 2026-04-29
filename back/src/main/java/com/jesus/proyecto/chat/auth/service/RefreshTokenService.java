@@ -30,9 +30,4 @@ public class RefreshTokenService {
             refreshTokenRepository.save(token);
         }
     }
-
-    @Transactional
-    public void limpiarRefreshTokensExpirados() {
-        // Limpiar tokens expirados o inválidos periódicamente
-    }
 }

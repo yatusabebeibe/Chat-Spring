@@ -13,6 +13,7 @@ public interface UsuarioChatMapper {
     @Mapping(target = "usuario", source = "usuario.usuario")
     @Mapping(target = "nombre", source = "usuario.nombre")
     @Mapping(target = "rol", source = "rol")
+    @Mapping(target = "extensionAvatar", ignore = true)
     UsuarioChatResponse toResponse(UsuarioChat usuarioChat);
 
 }

@@ -1,5 +1,6 @@
 package com.jesus.proyecto.chat._general.websocket.service;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,6 +68,7 @@ public class WebSocketMessageService {
             state.setUsuarioId(userId);
             state.setChatId(req.getChatId());
             state.setRequest(req);
+            state.setMessageRespuestaId(req.getMensajeRespuestaId());
 
             int fileCount = req.getArchivos() != null ? req.getArchivos().size() : 0;
             state.setExpectedFiles(fileCount);
@@ -109,6 +111,11 @@ public class WebSocketMessageService {
         Mensaje mensaje = mensajeMapper.toEntity(req);
         mensaje.setUsuario(usuarioService.buscarPorId(userId));
         mensaje.setFechaEnvio(Instant.now());
+
+        if (req.getMensajeRespuestaId() != null) {
+            Mensaje respuesta = mensajeService.obtenerMensaje(req.getMensajeRespuestaId());
+            mensaje.setMensajeRespuesta(respuesta);
+        }
 
         Mensaje guardado = mensajeService.guardar(mensaje);
 

@@ -11,6 +11,8 @@ public class SessionMessageState {
 
     private UUID messageId;
 
+    private UUID messageRespuestaId;
+
     private UUID usuarioId;
 
     private UUID chatId;

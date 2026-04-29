@@ -26,18 +26,37 @@
 
     <!-- MAIN (mensajes luego lo haces componente) -->
     <main class="chat-main" ref="chatMain">
-      <Mensaje v-for="mensaje in listaMensajesChatActual" :mensaje="mensaje" :key="mensaje.id"  />
+      <Mensaje
+        v-for="mensaje in listaMensajesChatActual"
+        :mensaje="mensaje"
+        :key="mensaje.id"
+        @responder="onResponder"
+      />
     </main>
 
     <!-- FOOTER (input de mensaje) -->
     <footer class="chat-footer">
 
+      <!-- archivos -->
       <div v-if="pendingFiles.length" class="files-preview">
         <div v-for="(file, i) in pendingFiles" :key="i" class="file-chip" @click="eliminarArchivo(i)">
           {{ file.name }}
         </div>
       </div>
 
+      <!-- 👇 AQUI -->
+      <div v-if="respuestaActiva" class="reply-box">
+        <div class="reply-content">
+          <span class="reply-label">Respondiendo a:</span>
+          <p>{{ getMensajeTexto(respuestaActiva.mensajeId) }}</p>
+        </div>
+
+        <button class="close-reply" @click="respuestaActiva = null">
+          ✕
+        </button>
+      </div>
+
+      <!-- input -->
       <div>
         <label class="file-btn">
           📎
@@ -85,6 +104,7 @@ const chatMain = ref(null)
 
 const texto = ref("")
 const textareaRef = ref(null)
+const respuestaActiva = ref(null)
 
 const imagenChat = computed(() => {
   const ext = chatActual.value?.extensionImagen || "jpg"
@@ -106,6 +126,11 @@ const abrirMenu = () => {
 const onFiles = (e) => {
   pendingFiles.value = Array.from(e.target.files)
 }
+function onResponder(data) {
+  respuestaActiva.value = data
+  texto.value = respuestaActiva.value.respuesta
+  setTimeout(autoResize, 100)
+}
 
 const enviar = () => {
   if (!socket.value || socket.value.readyState !== 1) return
@@ -114,6 +139,7 @@ const enviar = () => {
   const payload = {
     chatId: route.params.chatId, // luego lo conectas al chat seleccionado
     mensaje: texto.value,
+    mensajeRespuestaId: respuestaActiva.value?.mensajeId || null,
     archivos: pendingFiles.value.map(f => ({
       nombre: f.name,
       tipo: f.type
@@ -121,6 +147,15 @@ const enviar = () => {
   }
 
   socket.value.send(JSON.stringify(payload))
+
+  pendingFiles.value = []
+  texto.value = ""
+  respuestaActiva.value = null
+}
+
+function getMensajeTexto(id) {
+  const msg = listaMensajesChatActual.value.find(m => m.id === id)
+  return msg?.mensaje || "[archivo]"
 }
 
 window.addEventListener("ws-message-ready", async () => {
@@ -314,5 +349,26 @@ onBeforeUnmount(() => {
 
 .file-chip:hover {
   background: #bbb;
+}
+.reply-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* background: #eee; */
+  border-left: 4px solid #4caf50;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.reply-label {
+  font-weight: bold;
+  display: block;
+}
+
+.close-reply {
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 </style>

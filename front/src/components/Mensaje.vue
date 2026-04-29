@@ -21,6 +21,9 @@
         <button @click="resumirMensaje">
           Resumir
         </button>
+        <button @click="responderIA">
+          Responder IA
+        </button>
       </div>
 
       <!-- IMAGEN -->
@@ -78,24 +81,42 @@ const usuaioMsg = computed(() =>{
 const emit = defineEmits(['responder'])
 
 function responder() {
-  emit('responder', props.mensaje.mensajeRespuestaId)
+  emit('responder', {mensajeId: props.mensaje.id})
 }
 
 async function resumirMensaje() {
   try {
-    const url = `/msg/resumir?id=${props.mensaje.id}`
+    const url = `/msg/ai/resumir?id=${props.mensaje.id}`
 
     const res = await apiFetch(url)
 
-    // if (!res.ok) return
+    if (!res.ok) return
 
-    // dependiendo de tu backend puede venir como string o {data: "..."}
     const resumen = res.data.mensaje
 
-    // importante: asegurar reactividad
     props.mensaje.resumen = resumen
   } catch (e) {
     console.error("Error al resumir mensaje:", e)
+  }
+}
+async function responderIA() {
+  try {
+    const url = `/msg/ai/responder?id=${props.mensaje.id}`
+
+    const res = await apiFetch(url)
+
+    if (!res.ok) return
+
+    const respuesta = res.data.mensaje
+
+    // se lo mandas al padre
+    emit('responder', {
+      respuesta,
+      mensajeId: props.mensaje.id
+    })
+
+  } catch (e) {
+    console.error("Error al responder mensaje:", e)
   }
 }
 

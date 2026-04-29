@@ -57,6 +57,12 @@ public class OpenAiApi implements AIProvider {
 
             logResponse(response.body());
 
+            var root = objectMapper.readTree(response.body());
+
+            if (root.has("error")) {
+                throw new RuntimeException("IA error: " + root.path("error").path("message").asString());
+            }
+
             return parseChatResponse(response.body());
 
         } catch (Exception e) {

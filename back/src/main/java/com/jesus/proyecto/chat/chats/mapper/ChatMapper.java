@@ -15,6 +15,7 @@ public interface ChatMapper {
     
     @Mapping(source = "creador.id", target = "idCreador")
     @Mapping(target = "ultimoMensaje", ignore = true)
+    @Mapping(target = "avatarConversacion", ignore = true)
     ChatListResponse toListResponse(Chat chat);
 
 }
