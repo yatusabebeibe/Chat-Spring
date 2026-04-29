@@ -52,6 +52,20 @@
         <audio v-for="(url, i) in mensaje.urls" :key="i" controls>
           <source :src="getUrl(url)" />
         </audio>
+
+        <button
+          v-for="(url, i) in mensaje.urls"
+          :key="'t-' + i"
+          @click="transcribirAudio(i)"
+        >
+          Transcribir
+        </button>
+
+        <!-- TRANSCRIPCIÓN -->
+        <fieldset v-if="mensaje.transcripcion" class="resumen">
+          <legend>Transcripción:</legend>
+          <p>{{ mensaje.transcripcion }}</p>
+        </fieldset>
       </div>
 
       <!-- OTROS -->
@@ -183,6 +197,23 @@ async function descargar(url) {
 
   } catch (e) {
     console.error('Error descargando:', e)
+  }
+}
+
+async function transcribirAudio(indice) {
+  try {
+    const url = `/msg/ai/transcribir/${props.mensaje.id}/${indice}`
+
+    const res = await apiFetch(url)
+
+    if (!res.ok) return
+
+    const texto = res.data.mensaje
+
+    props.mensaje.transcripcion = texto
+
+  } catch (e) {
+    console.error("Error al transcribir audio:", e)
   }
 }
 

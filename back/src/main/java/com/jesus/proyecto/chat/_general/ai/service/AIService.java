@@ -1,5 +1,6 @@
 package com.jesus.proyecto.chat._general.ai.service;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,6 +137,15 @@ public class AIService {
             return response;
         } catch (Exception e) {
             return "/* No se pudo resumir el mensaje */";
+        }
+    }
+
+
+    public String transcribirAudio(Path audioPath) {
+        try {
+            return provider.transcribirAudio(audioPath);
+        } catch (Exception e) {
+            return "/* No se pudo transcribir el audio */";
         }
     }
 }
