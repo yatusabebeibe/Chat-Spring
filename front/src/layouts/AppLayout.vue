@@ -7,7 +7,7 @@
       </div>
       <div class="abajo">
         <MenuIconLink :to="{ name:'me' }" src="usuario2.svg" />
-        <MenuIconLink to="/ajustes" src="config.svg" />
+        <MenuIconLink :to="{ name:'logout'}" src="logout.svg" />
       </div>
     </div>
   </header>

@@ -12,10 +12,12 @@ import ChatRoom from "@/pages/ChatRoom.vue";
 import NewChat from "@/pages/NewChat.vue";
 import ChatDetalles from "@/pages/ChatDetalles.vue";
 import Me from "@/pages/Me.vue";
+import Logout from "@/pages/Logout.vue";
 
 const router = createRouter({
   history: createWebHistory( import.meta.env.BASE_URL ),
   routes: [
+    { name: "inicio", path: "/", component: Inicio },
     { // Login
       path: "/app/login", component: AuthLayout,
       children: [{ name: "login", path: "", component: Login }],
@@ -24,7 +26,7 @@ const router = createRouter({
       path: "/app/registro", component: AuthLayout,
       children: [{ name: "registro", path: "", component: Registro }]
     },
-    { name: "inicio", path: "/", component: Inicio },
+    { name: "logout", path: "/app/logout", component: Logout },
     {
       path: "/app",
       component: AppLayout,
