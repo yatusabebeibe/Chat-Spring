@@ -209,8 +209,8 @@ public class AuthService {
     private Cookie generarCookie(String nombre, String token, long edad) {
         Cookie cookie = new Cookie(nombre, token);
         cookie.setHttpOnly(true);
-        // cookie.setSecure(true);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
+        // cookie.setSecure(false);
         cookie.setPath("/");
         cookie.setMaxAge((int) (edad / 1000));
         return cookie;

@@ -141,10 +141,14 @@ const imgPorDefecto = computed(() =>
 
 /* IMAGEN */
 const seleccionarImagen = () => {
-  fileInput.value.click()
+  if (isGrupo.value) {
+    fileInput.value.click()
+  }
 }
 
 const cambiarImagen = async (e) => {
+  if (!isGrupo.value) return
+
   const file = e.target.files[0]
   if (!file) return
 

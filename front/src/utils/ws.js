@@ -9,6 +9,11 @@ let desconectManual = false
 export const conectarSocket = () => {
   desconectManual = false
 
+  if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+    desconectManual = true
+    socket.value.close()
+  }
+
   socket.value = new WebSocket(import.meta.env.VITE_WS_URL)
 
   socket.value.onmessage = (event) => {

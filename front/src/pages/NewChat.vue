@@ -25,26 +25,10 @@
         v-if="tipoChat === 'conversacion'"
         ref="userSearch"
         texto="¿Con que usuario?"
+        :errorMsg="errorUsuario"
       />
 
       <button v-if="tipoChat !== ''" type="submit">Crear</button>
-    </form>
-
-
-    <!-- FORM UNIRSE A GRUPO -->
-    <form class="card" @submit.prevent="handleJoinGroup">
-      
-      <h3>Unirse a grupo</h3>
-
-      <Inputs
-        v-model="codigoGrupo"
-        texto="Nombre o codigo del grupo"
-        name="codigoGrupo"
-        tipo="text"
-        :errorMsg="errorJoinGrupo"
-      />
-
-      <button type="submit">Unirse</button>
     </form>
 
   </div>
@@ -56,31 +40,33 @@ import { ref } from 'vue'
 import Inputs from '@/components/Inputs.vue'
 import BusquedaUsuarios from '@/components/BusquedaUsuarios.vue'
 import { apiFetch, cargarChats } from '@/utils/api.js'
+import router from '@/router/index.js'
 
 const tipoChat = ref('')
 const nombreGrupo = ref('')
-const codigoGrupo = ref('')
+const userSearch = ref(null)
 
 const errorNombreGrupo = ref('')
-const errorJoinGrupo = ref('')
-
-const userSearch = ref(null)
 
 /* CREAR CHAT */
 async function handleSubmit() {
-  errorNombreGrupo.value = ''
 
   let hayError = false
 
-  if (tipoChat.value === 'grupo' && !nombreGrupo.value.trim()) {
-    errorNombreGrupo.value = 'El nombre es obligatorio'
-    hayError = true
+  // limpiar errores en hijos
+  userSearch.value?.setError('')
+  
+  if (tipoChat.value === 'grupo') {
+    if (!nombreGrupo.value.trim()) {
+      hayError = true
+    }
   }
 
   if (tipoChat.value === 'conversacion') {
     const usuario = userSearch.value?.usuarioSeleccionado
 
     if (!usuario) {
+      userSearch.value?.setError('Selecciona un usuario')
       hayError = true
     }
   }
@@ -99,34 +85,25 @@ async function handleSubmit() {
 
   const res = await apiFetch("/chat", payload, "POST")
 
-  if (!res.ok) return
+  if (!res.ok) {
+
+    if (tipoChat.value === 'grupo') {
+      // aquí podrías usar Inputs si tienes setError en Inputs
+      errorNombreGrupo.value = res.data || 'Error creando grupo'
+    }
+
+    if (tipoChat.value === 'conversacion') {
+      userSearch.value?.setError(res.data?.error || 'Error creando conversación')
+    }
+
+    return
+  }
 
   cargarChats()
+  router.push({ name:'app' })
 
   tipoChat.value = ''
   nombreGrupo.value = ''
-}
-
-/* UNIRSE A GRUPO */
-async function handleJoinGroup() {
-  errorJoinGrupo.value = ''
-
-  if (!codigoGrupo.value.trim()) {
-    errorJoinGrupo.value = 'Introduce un grupo'
-    return
-  }
-
-  const res = await apiFetch("/chat/unirse", {
-    grupo: codigoGrupo.value
-  }, "POST")
-
-  if (!res.ok) {
-    errorJoinGrupo.value = res.data?.error || 'Error al unirse'
-    return
-  }
-
-  cargarChats()
-  codigoGrupo.value = ''
 }
 </script>
 

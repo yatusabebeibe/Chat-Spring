@@ -13,7 +13,6 @@ import lombok.Getter;
 @Getter
 public class ChatRequest {
 
-    // @NotBlank(message = "Es obligatorio poner nombre al grupo")
     @Size(
         min = ChatValidations.MIN_NOMBRE_LENGTH,
         max = ChatValidations.MAX_NOMBRE_LENGTH,

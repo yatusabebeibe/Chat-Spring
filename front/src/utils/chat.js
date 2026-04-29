@@ -1,5 +1,6 @@
 import { chatConfig } from "@/config.js"
 import { computed, ref } from "vue"
+import { cerrarSocket, conectarSocket, socket } from "./ws.js"
 
 export const mapaChats = ref(new Map())
 export const listaMensajesChatActual = ref([])
@@ -27,6 +28,10 @@ export const buscarIndexPorId = (lista, id) => {
 }
 
 export const mergeChats = (nuevosChats) => {
+  if (nuevosChats.length > mapaChats.value.size) {
+    cerrarSocket()
+    conectarSocket()
+  }
   mapaChats.value = new Map(
     nuevosChats.map(chat => [chat.id, chat])
   )

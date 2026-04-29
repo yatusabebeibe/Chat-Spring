@@ -15,7 +15,11 @@ async function rawFetch(url, body = null, method = "GET") {
       credentials: 'include',
     })
 
-    const data = await res.json()
+    let data = null
+
+    const text = await res.text()
+
+    data = text ? JSON.parse(text) : null
 
     return {
       ok: res.ok,
@@ -23,6 +27,8 @@ async function rawFetch(url, body = null, method = "GET") {
       data
     }
   } catch (error) {
+    console.log(error);
+    
     return {
       ok: false,
       status: 500,
