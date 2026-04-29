@@ -8,7 +8,7 @@
 
     <div class="body">
       <!-- PREVIEW RESPUESTA -->
-      <div v-if="mensajeRespuesta" class="respuesta-preview">
+      <div v-if="mensajeRespuesta" class="respuesta-preview" @click="irAlMensaje">
         <div class="respuesta-user">
           {{ getUsuarioRespuesta }}
         </div>
@@ -71,18 +71,18 @@
 </template>
 
 <script setup>
-import { apiFetch } from '@/utils/api.js'
-import { mapaUsuariosChatActual } from '@/utils/chat.js'
-import { computed } from 'vue'
+import { apiFetch, obtenerMsgEspecifico } from '@/utils/api.js'
+import { listaMensajesChatActual, mapaUsuariosChatActual } from '@/utils/chat.js'
+import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
   mensaje: Object,
-  mensajeRespuesta: {
-    type: Object,
-    required: false,
-    default: null
-  }
 })
+const emit = defineEmits(['responder', 'ir-mensaje'])
+
+
+const mensajeRespuesta = ref(null)
+
 
 const usuaioMsg = computed(() =>{
   const usuario = mapaUsuariosChatActual.value.get(props.mensaje.usuarioId)
@@ -92,17 +92,25 @@ const usuaioMsg = computed(() =>{
   return ""
 })
 const getUsuarioRespuesta = computed(() => {
-  const usuario = mapaUsuariosChatActual.value.get(props.mensajeRespuesta?.usuarioId)
+  const msg = mensajeRespuesta.value
+  if (!msg) return ""
+
+  const usuario = mapaUsuariosChatActual.value.get(msg.usuarioId)
+
   if (usuario?.nombre && usuario?.usuario) {
     return `${usuario.nombre} (@${usuario.usuario})`
   }
+
   return ""
 })
 
-const emit = defineEmits(['responder'])
-
 function responder() {
   emit('responder', {mensajeId: props.mensaje.id})
+}
+function irAlMensaje() {
+  if (!mensajeRespuesta.value) return
+
+  emit('ir-mensaje', mensajeRespuesta.value.id)
 }
 
 async function resumirMensaje() {
@@ -177,6 +185,26 @@ async function descargar(url) {
     console.error('Error descargando:', e)
   }
 }
+
+async function cargarMensajeRespuesta(id) {
+  if (!id) return null
+
+  // 1. buscar en lista local
+  const local = listaMensajesChatActual.value.find(m => m.id === id)
+  if (local) {
+    mensajeRespuesta.value = local
+    return
+  }
+
+  // 2. fallback API
+  mensajeRespuesta.value = await obtenerMsgEspecifico(id, props.mensaje.chatId)
+}
+
+watch(
+  () => props.mensaje.mensajeRespuestaId,
+  (id) => cargarMensajeRespuesta(id),
+  { immediate: true }
+)
 </script>
 
 <style scoped>

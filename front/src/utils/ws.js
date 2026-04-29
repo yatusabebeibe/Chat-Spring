@@ -54,7 +54,18 @@ export const cerrarSocket = () => {
 }
 
 addEventListener("ws-new-message", async (e) => {
-  console.log(e.detail)
-  añadirMensajesFinal([e.detail])
-  actualizarChatUltimoMensaje(e.detail)
+  const mensaje = e.detail
+  console.log(mensaje)
+
+  const chat = mapaChats.value.get(mensaje.chatId)
+  const ultimoLocal = listaMensajesChatActual.value.at(-1)
+
+  const esMismoUltimo = chat?.ultimoMensaje?.id === ultimoLocal?.id
+
+
+  if (esMismoUltimo) {
+    añadirMensajesFinal([mensaje])
+  }
+
+  actualizarChatUltimoMensaje(mensaje)
 })

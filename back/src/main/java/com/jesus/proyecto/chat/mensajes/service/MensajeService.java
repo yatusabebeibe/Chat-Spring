@@ -1,5 +1,6 @@
 package com.jesus.proyecto.chat.mensajes.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,10 +45,14 @@ public class MensajeService {
         if (req.getMsgId() == null) {
             mensajes = getInitial(req.getChatId(), limite);
         } else {
-            if (req.getSentido() == SentidoMensaje.ANT) {
-                mensajes = getOlder(req.getChatId(), req.getMsgId(), limite);
+            if (req.getSentido() == null) {
+                mensajes = List.of(obtenerMensaje(req.getMsgId()));
             } else {
-                mensajes = getNewer(req.getChatId(), req.getMsgId(), limite);
+                if (req.getSentido() == SentidoMensaje.ANT) {
+                    mensajes = getOlder(req.getChatId(), req.getMsgId(), limite);
+                } else {
+                    mensajes = getNewer(req.getChatId(), req.getMsgId(), limite);
+                }
             }
         }
 

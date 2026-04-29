@@ -1,6 +1,5 @@
 package com.jesus.proyecto.chat._general.websocket.service;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -110,3 +110,14 @@ export const obtenerImgPorDefecto = (esGrupo) => {
     ? "/icons/chat/grupos.svg"
     : "/icons/chat/conversaciones.svg"
 }
+
+export const obtenerMsgEspecifico = async (id, chatId) => {
+  try {
+    const res = await apiFetch(`/msg?chatId=${chatId}&msgId=${id}`)
+    if (res.ok) {
+      return res.data[0]
+    }
+  } catch (e) {
+    console.error("Error cargando mensaje respuesta:", e)
+  }
+}

@@ -29,9 +29,9 @@
       <Mensaje
         v-for="mensaje in listaMensajesChatActual"
         :mensaje="mensaje"
-        :mensajeRespuesta="getMensajeRespuesta(mensaje)"
         :key="mensaje.id"
         @responder="onResponder"
+        @ir-mensaje="irAMensaje"
       />
     </main>
 
@@ -92,7 +92,7 @@
 <script setup>
 import Mensaje from "@/components/Mensaje.vue"
 import MenuIconButon from "@/components/MenuIconButon.vue"
-import { apiFetch, cargarMensajesChats, obtenerImgPorDefecto } from "@/utils/api.js"
+import { apiFetch, cargarMensajesChats, obtenerImgPorDefecto, obtenerMsgEspecifico } from "@/utils/api.js"
 import { getChatActual, listaMensajesChatActual } from "@/utils/chat.js"
 import { scrollInfinito } from "@/utils/scroll.js"
 import { socket } from "@/utils/ws.js"
@@ -103,7 +103,6 @@ const route = useRoute()
 const chatActual = computed(() => getChatActual(route.params.chatId).value)
 
 const chatMain = ref(null)
-const cacheRespuestas = new Map()
 let scrollInstance = null
 
 const texto = ref("")
@@ -162,39 +161,6 @@ function getMensajeTexto(id) {
   return msg?.mensaje || "[archivo]"
 }
 
-async function fetchMensajeRespuesta(id) {
-  try {
-    const res = await apiFetch(`/msg?chatId=${route.params.chatId}&msgId=${id}`)
-
-    if (!res.ok) return
-
-    const msg = res.data
-
-    cacheRespuestas.set(id, msg)
-
-  } catch (e) {
-    console.error("Error obteniendo mensaje respuesta:", e)
-  }
-}
-
-function getMensajeRespuesta(mensaje) {
-  const id = mensaje.mensajeRespuestaId
-  if (!id) return null
-
-  // 1. buscar en lista
-  const local = listaMensajesChatActual.value.find(m => m.id === id)
-  if (local) return local
-
-  // 2. cache
-  if (cacheRespuestas.has(id)) return cacheRespuestas.get(id)
-
-  // 3. fetch (async pero devolvemos null de momento)
-  console.log("iuhfdsauifhpidsa",fetchMensajeRespuesta(id));
-  
-
-  return null
-}
-
 window.addEventListener("ws-message-ready", async () => {
   for (const file of pendingFiles.value) {
     const buffer = await file.arrayBuffer()
@@ -205,11 +171,48 @@ window.addEventListener("ws-message-ready", async () => {
   texto.value = ""
 })
 
-const scrollAbajo = async () => {
+const ponerScrollAbajo = async () => {
   await nextTick()
   if (chatMain.value) {
     chatMain.value.scrollTop = chatMain.value.scrollHeight
   }
+}
+
+const irAMensaje = async (id) => {
+  const found = await highlightAndScroll(id)
+  if (found) return
+
+  try {
+    const msg = await obtenerMsgEspecifico(id, route.params.chatId)
+
+    if (!msg) return
+
+    listaMensajesChatActual.value = [msg]
+
+    await highlightAndScroll(id)
+
+  } catch (e) {
+    console.error("Error navegando a mensaje:", e)
+  }
+}
+const highlightAndScroll = async (id) => {
+  await nextTick()
+
+  const elem = document.querySelector(`[data-id="${id}"]`)
+  if (!elem) return false
+
+  elem.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  })
+
+  elem.classList.add("highlight")
+
+  setTimeout(() => {
+    elem.classList.remove("highlight")
+  }, 1500)
+
+  return true
 }
 
 const autoResize = () => {
@@ -228,7 +231,7 @@ const eliminarArchivo = (index) => {
 
 onBeforeMount(async () => {
   await cargarMensajesChats(route.params.chatId)
-  await scrollAbajo()
+  await ponerScrollAbajo()
   console.log(listaMensajesChatActual.value);
 })
 
@@ -240,7 +243,7 @@ onBeforeRouteUpdate(async (to, from, next) => {
   listaMensajesChatActual.value = []
   await cargarMensajesChats(to.params.chatId)
   scrollInstance = scrollInfinito(chatMain.value)
-  await scrollAbajo()
+  await ponerScrollAbajo()
   next()
 })
 
@@ -417,4 +420,8 @@ onBeforeUnmount(() => {
   border: none;
   cursor: pointer;
 }
+.highlight {
+  background: rgba(76, 175, 80, 0.2);
+  transition: background 0.3s ease;
+} 
 </style>
