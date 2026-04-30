@@ -3,59 +3,26 @@
 
     <div class="bloque">
       <h1>Hola, soy Jesus.</h1>
-      <p>He estudiado DAW (Desarrollo de Aplicaciones Web) en el IES Los Sauces de Benavente.</p>
+      <p>Soy estudiante de DAW (Desarrollo de Aplicaciones Web).</p>
       <p>Mi proyecto es una aplicacion fullstack de chat en tiempo real.</p>
     </div>
 
     <div class="bloque">
       <h2>Requisitos funcionales</h2>
 
-      <div class="periodico">
-          <p><b>1.</b> Interfaz con cabecera y navegación común</p>
-          <p><b>2.</b> Registro de usuarios</p>
-          <p><b>3.</b> Login de usuarios</p>
-          <p><b>4.</b> Lista de conversaciones del usuario</p>
-          <p><b>5.</b> Acceso solo a conversaciones propias</p>
-          <p><b>6.</b> Acceso permanente a conversaciones</p>
-          <p><b>7.</b> Persistencia de mensajes</p>
-          <p><b>8.</b> Autenticación obligatoria</p>
-          <p><b>9.</b> Mensajes en tiempo real</p>
-          <p><b>10.</b> Estructura de mensajes</p>
-
-          <p><b>11.</b> Navegación entre conversaciones</p>
-          <p><b>12.</b> Envío de mensajes</p>
-          <p><b>13.</b> Chats privados y grupales</p>
-          <p><b>14.</b> Validación de datos</p>
-          <p><b>15.</b> Validación de login</p>
-          <p><b>16.</b> Registro de errores</p>
-          <p><b>17.</b> Contraseñas seguras</p>
-          <p><b>18.</b> Configuración de la app</p>
-          <p><b>19.</b> JWT para guardar sesión</p>
-          <p><b>20.</b> Edición de perfil</p>
-
-          <p><b>21.</b> Historial de mensajes</p>
-          <p><b>22.</b> Subida de archivos</p>
-          <p><b>23.</b> Actualización en tiempo real</p>
-          <p><b>24.</b> Gestión de grupos</p>
-          <p><b>25.</b> Control de acceso a chats</p>
-          <p><b>26.</b> IA integrada</p>
-          <p><b>27.</b> Paginación de mensajes</p>
-          <p><b>28.</b> Respuestas a mensajes</p>
-          <p><b>29.</b> Acceso a mensaje original</p>
-          <p><b>30.</b> Edición de perfil</p>
-      </div>
-    </div>
-
     <div class="grupo">
       <div class="bloque">
         <h2>Tecnologias</h2>
         <ul>
-          <li>Frontend: Vue</li>
+          <li>Frontend: Vue + vue-router</li>
           <li>Backend: Spring Boot</li>
-          <li>Autenticacion: JWT en cookies</li>
+          <li>Autenticacion: JWT en cookies con Spring Security</li>
+          <li>IA: groq y OpenAI Whisper</li>
+          <li>DB: MySQL</li>
           <li>WebSockets</li>
           <li>Lombok</li>
           <li>MapStruct</li>
+          <li>BCrypt</li>
         </ul>
       </div>
 
@@ -73,6 +40,41 @@
           <li>Excepciones personalizadas para datos incorrectos</li>
           <li>JWT verificados en BD</li>
         </ul>
+      </div>
+    </div>
+
+      <div class="periodico">
+          <p><b>1.</b> Interfaz con cabecera y navegación común</p>
+          <p><b>2.</b> Registro de usuarios</p>
+          <p><b>3.</b> Login de usuarios</p>
+          <p><b>4.</b> Lista de conversaciones del usuario</p>
+          <p><b>5.</b> Acceso solo a conversaciones propias</p>
+          <p><b>6.</b> Edición de perfil</p>
+          <p><b>7.</b> Persistencia de mensajes</p>
+          <p><b>8.</b> Autenticación obligatoria</p>
+          <p><b>9.</b> Mensajes en tiempo real</p>
+          <p><b>10.</b> Estructura de mensajes</p>
+
+          <p><b>11.</b> Navegación entre conversaciones</p>
+          <p><b>12.</b> Envío de mensajes</p>
+          <p><b>13.</b> Chats privados y grupales</p>
+          <p><b>14.</b> Validación de datos</p>
+          <p><b>15.</b> Validación de login</p>
+          <p><b>16.</b> Errores propios</p>
+          <p><b>17.</b> Contraseñas encriptadas</p>
+          <p><b>18.</b> Configuración de la app</p>
+          <p><b>19.</b> JWT para guardar sesión</p>
+          <p><b>20.</b> Edición de perfil</p>
+
+          <p><b>21.</b> Historial de mensajes</p>
+          <p><b>22.</b> Subida de archivos</p>
+          <p><b>23.</b> Actualización en tiempo real</p>
+          <p><b>24.</b> Gestión de grupos</p>
+          <p><b>25.</b> Control de acceso a chats</p>
+          <p><b>26.</b> IA integrada</p>
+          <p><b>27.</b> Paginación de mensajes</p>
+          <p><b>28.</b> Respuestas a mensajes</p>
+          <p><b>29.</b> Acceso a mensaje original</p>
       </div>
     </div>
 

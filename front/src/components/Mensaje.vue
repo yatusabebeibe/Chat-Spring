@@ -320,4 +320,19 @@ button {
   word-break: break-word;
   overflow-wrap: anywhere;
 }
+button {
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-right: 5px;
+  background-color: rgba(0, 0, 0, 0.151);
+  padding: 2px 10px;
+  color: #ddd;
+  font-weight: 650;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+button:hover {
+  transform: scale(1.05);
+}
 </style>

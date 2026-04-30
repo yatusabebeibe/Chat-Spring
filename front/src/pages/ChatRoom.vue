@@ -16,11 +16,13 @@
         </span>
       </RouterLink>
 
-      <MenuIconButon
+      <div></div>
+      <!-- <MenuIconButon
         src="menu.png"
         :onClick="abrirMenu"
         tooltip="Menu"
-      />
+        style="opacity: 0;"
+      /> -->
 
     </nav>
 

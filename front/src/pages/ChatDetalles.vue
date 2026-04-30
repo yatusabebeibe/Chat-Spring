@@ -45,8 +45,8 @@
       </div>
 
       <div v-if="isGrupo" class="item">
-        <span>Creador</span>
-        <p>{{ chatActual.idCreador }}</p>
+        <span>Dueño</span>
+        <p>{{ usuarios.find(([id]) => id === chatActual.idCreador)?.[1]?.nombre || chatActual.idCreador }}</p>
       </div>
 
       <div class="item">
@@ -77,8 +77,8 @@
               Admin
             </span>
 
-            <span v-if="id === chatActual.idCreador && isGrupo" class="badge creador">
-              Creador
+            <span v-if="id === chatActual.idCreador && isGrupo" class="badge dueño">
+              Dueño
             </span>
           </p>
 
@@ -317,7 +317,7 @@ onBeforeUnmount(() => {
   background: #4d79ff;
 }
 
-.creador {
+.dueño {
   background: #ffb84d;
 }
 
