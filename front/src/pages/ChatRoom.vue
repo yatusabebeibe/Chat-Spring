@@ -54,7 +54,7 @@
           <p>{{ getMensajeTexto(respuestaActiva.mensajeId) }}</p>
         </div>
 
-        <button class="close-reply" @click="respuestaActiva = null">
+        <button class="close-reply" @click="respuestaActiva = null" style="color: white;">
           ✕
         </button>
       </div>

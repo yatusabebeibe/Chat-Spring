@@ -7,8 +7,6 @@
       <p>Mi proyecto es una aplicacion fullstack de chat en tiempo real.</p>
     </div>
 
-    <div class="bloque">
-      <h2>Requisitos funcionales</h2>
 
     <div class="grupo">
       <div class="bloque">
@@ -16,9 +14,9 @@
         <ul>
           <li>Frontend: Vue + vue-router</li>
           <li>Backend: Spring Boot</li>
-          <li>Autenticacion: JWT en cookies con Spring Security</li>
+          <li>Autenticacion: JWT en cookies con Spring Security con access y refresh token</li>
           <li>IA: groq y OpenAI Whisper</li>
-          <li>DB: MySQL</li>
+          <li>DB: MySQL con Hibernate</li>
           <li>WebSockets</li>
           <li>Lombok</li>
           <li>MapStruct</li>
@@ -43,6 +41,8 @@
       </div>
     </div>
 
+    <div class="bloque">
+      <h2>Requisitos funcionales</h2>
       <div class="periodico">
           <p><b>1.</b> Interfaz con cabecera y navegación común</p>
           <p><b>2.</b> Registro de usuarios</p>
@@ -129,8 +129,8 @@ import { RouterLink } from "vue-router";
 
   background: linear-gradient(
     145deg,
-    #ffffff08,
-    #ffffff02
+    #ffffff0f,
+    #ffffff0f
   );
 
   box-shadow: 0 8px 25px #00000040;

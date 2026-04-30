@@ -19,7 +19,7 @@ public class AuthRequest {
         max = UsuarioValidations.MAX_USR_LENGTH,
         message = UsuarioValidations.MSG_USR_LENGTH
     )
-    @Pattern(regexp = UsuarioValidations.PATRON_USUARIO)
+    @Pattern(regexp = UsuarioValidations.PATRON_USUARIO, message = "Solo letras minusculas, numeros y '_'")
     private String usuario;
 
     @NotBlank(message = "La contraseña no puede estar vacía")

@@ -318,7 +318,8 @@ onBeforeUnmount(() => {
 }
 
 .dueño {
-  background: #ffb84d;
+  background: #e29842;
+  color: white;
 }
 
 .acciones {
