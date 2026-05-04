@@ -37,12 +37,12 @@ public class ChatService {
     private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
 
     public ChatResponse crear(ChatRequest chatRequest, String usuario) {
-        Usuario creador = usuarioRepository.findByUsuario( usuario )
+        Usuario owner = usuarioRepository.findByUsuario( usuario )
                 .orElseThrow(() -> new UsuarioNoEncontradoException());
 
         Chat chat = switch (chatRequest.getTipo()) {
-            case GRUPO -> crearGrupo(chatRequest.getNombre(), creador);
-            case CONVERSACION -> obtenerOCrearConversacion( creador, chatRequest.getIdParticipante() );
+            case GRUPO -> crearGrupo(chatRequest.getNombre(), owner);
+            case CONVERSACION -> obtenerOCrearConversacion( owner, chatRequest.getIdParticipante() );
         };
 
         logger.error("-----------------------------------------");
@@ -52,23 +52,23 @@ public class ChatService {
         return chatMapper.toResponse(chat);
     }
 
-    private Chat crearChatBase(TipoChat tipo, Usuario creador) {
-        return crearChatBase(tipo, creador, null);
+    private Chat crearChatBase(TipoChat tipo, Usuario owner) {
+        return crearChatBase(tipo, owner, null);
     }
 
-    private Chat crearChatBase(TipoChat tipo, Usuario creador, String nombre) {
+    private Chat crearChatBase(TipoChat tipo, Usuario owner, String nombre) {
         Chat chat = new Chat();
         chat.setTipo(tipo);
-        chat.setCreador(creador);
+        chat.setOwner(owner);
         chat.setNombre(nombre);
         return chatRepository.save(chat);
     }
 
-    private Chat crearGrupo(String nombreGrupo, Usuario creador) {
-        Chat chat = crearChatBase(TipoChat.GRUPO, creador, nombreGrupo);
-        logger.info("Se ha creado el grupo '{}' por el usuario con id '{}'", nombreGrupo, creador.getId());
+    private Chat crearGrupo(String nombreGrupo, Usuario owner) {
+        Chat chat = crearChatBase(TipoChat.GRUPO, owner, nombreGrupo);
+        logger.info("Se ha creado el grupo '{}' por el usuario con id '{}'", nombreGrupo, owner.getId());
 
-        usuarioChatService.agregarUsuario(creador, chat, RolEnChat.ADMIN);
+        usuarioChatService.agregarUsuario(owner, chat, RolEnChat.ADMIN);
 
         return chat;
     }

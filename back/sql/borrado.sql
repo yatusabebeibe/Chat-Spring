@@ -14,5 +14,5 @@ SELECT CURRENT_TIMESTAMP(6);
 
 SHOW CREATE TABLE chats;
 
-INSERT INTO chats (id, fecha_creacion, nombre, tipo, id_creador)
+INSERT INTO chats (id, fecha_creacion, nombre, tipo, id_owner)
 VALUES (UUID(), CURRENT_TIMESTAMP(6), 'test', 'GRUPO', UUID());

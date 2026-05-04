@@ -18,7 +18,7 @@ public class ChatResponse {
 
     private TipoChat tipo; // CONVERSACION (1a1) o GRUPO
 
-    private UUID idCreador;
+    private UUID ownerId;
 
     private String extensionImagen; // puede ser null
 

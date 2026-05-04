@@ -10,10 +10,10 @@ import com.jesus.proyecto.chat.chats.entity.Chat;
 @Mapper(componentModel = "spring")
 public interface ChatMapper {
 
-    @Mapping(source = "creador.id", target = "idCreador")
+    @Mapping(source = "owner.id", target = "ownerId")
     ChatResponse toResponse(Chat chat);
     
-    @Mapping(source = "creador.id", target = "idCreador")
+    @Mapping(source = "owner.id", target = "ownerId")
     @Mapping(target = "ultimoMensaje", ignore = true)
     @Mapping(target = "avatarConversacion", ignore = true)
     ChatListResponse toListResponse(Chat chat);

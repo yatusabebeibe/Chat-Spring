@@ -1,6 +1,7 @@
 package com.jesus.proyecto.chat.relacionUsuarioChat.service;
 
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import com.jesus.proyecto.chat._general.exceptions.UsuarioYaEstaEnGrupoException
 import com.jesus.proyecto.chat.chats.entity.Chat;
 import com.jesus.proyecto.chat.chats.repository.ChatRepository;
 import com.jesus.proyecto.chat.chats.utils.TipoChat;
+import com.jesus.proyecto.chat.relacionUsuarioChat.entity.I_UsuarioChatId;
 import com.jesus.proyecto.chat.relacionUsuarioChat.entity.UsuarioChat;
 import com.jesus.proyecto.chat.relacionUsuarioChat.repository.UsuarioChatRepository;
 import com.jesus.proyecto.chat.usuarios.entity.Usuario;
@@ -92,5 +94,41 @@ public class UsuarioChatService {
 
     public List<UsuarioChat> obtenerMiembrosDeGrupo(UUID chatId) {
         return usuarioChatRepository.findById_IdChat(chatId);
+    }
+
+    public void quitarMiembroGrupo(UUID chatId, UUID usuarioId) {
+        Chat chat = chatRepository.findById(chatId).orElse(null);
+        if (chat == null) {
+            throw new ChatNoEncontradoException();
+        }
+
+        usuarioChatRepository.deleteById(new I_UsuarioChatId(usuarioId, chatId));
+
+        List<UsuarioChat> usrsChat = usuarioChatRepository.findById_IdChat(chatId);
+
+        if (usrsChat.isEmpty()) {
+            chatRepository.delete(chat);
+        }
+        else if (chat.getOwner().getId().equals(usuarioId)) {
+            List<UsuarioChat> adminsChat = usrsChat.stream()
+                    .filter(uc -> uc.getRol().equals(RolEnChat.ADMIN))
+                    .toList();
+
+            UsuarioChat nuevoOwner;
+
+            if (!adminsChat.isEmpty()) {
+                nuevoOwner = adminsChat.get(new Random().nextInt(adminsChat.size()));
+            }
+            else {
+                nuevoOwner = usrsChat.get(new Random().nextInt(usrsChat.size()));
+
+                nuevoOwner.setRol(RolEnChat.ADMIN);
+
+                usuarioChatRepository.save(nuevoOwner);
+            }
+
+            chat.setOwner(nuevoOwner.getUsuario());
+            chatRepository.save(chat);
+        }
     }
 }

@@ -5,7 +5,9 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -96,5 +98,14 @@ public class ChatController {
         }
 
         usuarioChatService.añadirMiembroGrupo(chatId, usuarioId);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> salir(@PathVariable UUID id, Authentication auth) {
+        Usuario usuario = usuarioService.buscarPorUsuario(auth.getName());
+
+        usuarioChatService.quitarMiembroGrupo(id, usuario.getId());
+
+        return ResponseEntity.ok().build();
     }
 }

@@ -46,7 +46,7 @@
 
       <div v-if="isGrupo" class="item">
         <span>Dueño</span>
-        <p>{{ usuarios.find(([id]) => id === chatActual.idCreador)?.[1]?.nombre || chatActual.idCreador }}</p>
+        <p>{{ usuarios.find(([id]) => id === chatActual.ownerId)?.[1]?.nombre || chatActual.ownerId }}</p>
       </div>
 
       <div class="item">
@@ -77,7 +77,7 @@
               Admin
             </span>
 
-            <span v-if="id === chatActual.idCreador && isGrupo" class="badge dueño">
+            <span v-if="id === chatActual.ownerId && isGrupo" class="badge dueño">
               Dueño
             </span>
           </p>
@@ -100,7 +100,9 @@
     </div>
 
     <div v-if="isGrupo" class="acciones">
-      <button class="salir">Salir del grupo</button>
+      <button class="salir" @click="salir">
+        Salir del grupo
+      </button>
     </div>
   </div>
 </template>
@@ -108,7 +110,8 @@
 <script setup>
 import BusquedaUsuarios from "@/components/BusquedaUsuarios.vue"
 import Inputs from "@/components/Inputs.vue"
-import { apiFetch, apiFetchArchivos, obtenerImgPorDefecto } from "@/utils/api.js"
+import router from "@/router"
+import { apiFetch, apiFetchArchivos, cargarChats, obtenerImgPorDefecto } from "@/utils/api.js"
 import { getChatActual, mapaUsuariosChatActual } from "@/utils/chat.js"
 import { computed, onBeforeUnmount, onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
@@ -187,6 +190,21 @@ const agregarUsuario = async () => {
   }
 
   modoAgregar.value = false
+}
+
+const salir = async () => {
+  const res = await apiFetch(
+    `/chat/${chatActual.value.id}`,
+    null,
+    "DELETE"
+  )
+
+  if (!res.ok) {
+    userSearch.value?.setError(res.data?.error || 'Error salir del grupo')
+    return
+  }
+  cargarChats()
+  router.push({name: 'app'})
 }
 
 /* FECHA */

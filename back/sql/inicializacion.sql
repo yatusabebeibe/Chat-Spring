@@ -21,10 +21,10 @@ CREATE TABLE IF NOT EXISTS chats (
     id                              BINARY(16) PRIMARY KEY,
     nombre                          VARCHAR(30),
     tipo                            VARCHAR(20) NOT NULL, -- CONVERSACION o GRUPO
-    id_creador                      BINARY(16) NOT NULL,
+    id_owner                      BINARY(16) NOT NULL,
     fecha_creacion                  TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     
-    FOREIGN KEY (id_creador) REFERENCES usuarios(id)
+    FOREIGN KEY (id_owner) REFERENCES usuarios(id)
 );
 
 -- ============================================
@@ -97,7 +97,7 @@ INSERT INTO usuarios (id, usuario, nombre, password, avatar) VALUES
 -- ============================================
 -- DATOS INICIALES: GRUPOS DE CHAT
 -- ============================================
-INSERT INTO chats (id, nombre, tipo, id_creador) VALUES
+INSERT INTO chats (id, nombre, tipo, id_owner) VALUES
 (X'660e8400e29b41d4a716446655440001', 'Grupo Desarrollo Java', 'GRUPO', X'550e8400e29b41d4a716446655440001'),
 (X'660e8400e29b41d4a716446655440002', 'Grupo Proyecto Chat', 'GRUPO', X'550e8400e29b41d4a716446655440002'),
 (X'660e8400e29b41d4a716446655440003', 'Grupo Backend Team', 'GRUPO', X'550e8400e29b41d4a716446655440003'),
@@ -107,7 +107,7 @@ INSERT INTO chats (id, nombre, tipo, id_creador) VALUES
 -- ============================================
 -- DATOS INICIALES: CONVERSACIONES 1 a 1
 -- ============================================
-INSERT INTO chats (id, nombre, tipo, id_creador) VALUES
+INSERT INTO chats (id, nombre, tipo, id_owner) VALUES
 (X'660e8400e29b41d4a716446655441001', 'Conversa Juan - María', 'CONVERSACION', X'550e8400e29b41d4a716446655440001'),
 (X'660e8400e29b41d4a716446655441002', 'Conversa Juan - Carlos', 'CONVERSACION', X'550e8400e29b41d4a716446655440001'),
 (X'660e8400e29b41d4a716446655441003', 'Conversa María - Carlos', 'CONVERSACION', X'550e8400e29b41d4a716446655440002'),

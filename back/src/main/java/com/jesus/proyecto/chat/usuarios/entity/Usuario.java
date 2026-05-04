@@ -47,7 +47,6 @@ public class Usuario {
     private Instant fechaCreacion = Instant.now();
 
     @Column(nullable = false, columnDefinition = "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
-    @CreationTimestamp
     private Instant fechaUltimaConexion;
 
     @Column(length = 5, nullable = true)

@@ -52,8 +52,8 @@ public class Chat {
     private TipoChat tipo;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "id_creador", nullable = false)
-    private Usuario creador;
+    @JoinColumn(name = "id_owner", nullable = false)
+    private Usuario owner;
 
     @Column(nullable = false, updatable = false, columnDefinition = "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
