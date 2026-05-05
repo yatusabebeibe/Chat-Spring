@@ -67,11 +67,11 @@ public class Mensaje {
     @Column(columnDefinition = "TEXT")
     private String mensaje;
 
-    @Column(nullable = false, columnDefinition = "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     private Instant fechaEnvio = Instant.now();
 
-    @Column(nullable = true, columnDefinition = "DATETIME(3)")
+    @Column(nullable = true, columnDefinition = "TIMESTAMP(3)")
     private Instant fechaEdicion;
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")

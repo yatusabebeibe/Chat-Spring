@@ -33,7 +33,7 @@ public class UsuarioChat {
     @EmbeddedId
     private I_UsuarioChatId id;
 
-    @Column(nullable = false, columnDefinition = "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     private Instant fechaUnion;
 

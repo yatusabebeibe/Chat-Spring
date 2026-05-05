@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import com.jesus.proyecto.chat.relacionUsuarioChat.entity.UsuarioChat;
 import com.jesus.proyecto.chat.usuarios.utils.UsuarioValidations;
@@ -42,11 +43,12 @@ public class Usuario {
     @Column(nullable = false, length = 60)
     private String password;
 
-    @Column(nullable = false, columnDefinition = "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
-    private Instant fechaCreacion = Instant.now();
+    private Instant fechaCreacion;
 
-    @Column(nullable = false, columnDefinition = "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
+    @UpdateTimestamp
     private Instant fechaUltimaConexion;
 
     @Column(length = 5, nullable = true)

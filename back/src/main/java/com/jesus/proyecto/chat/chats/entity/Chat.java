@@ -55,7 +55,7 @@ public class Chat {
     @JoinColumn(name = "id_owner", nullable = false)
     private Usuario owner;
 
-    @Column(nullable = false, updatable = false, columnDefinition = "DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     private Instant fechaCreacion;
 
