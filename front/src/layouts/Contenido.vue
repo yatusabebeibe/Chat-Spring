@@ -25,7 +25,7 @@ const cargarUsuarios = async (chatId) => {
 onBeforeMount(async () => {
   if (route.params.chatId) {
     await cargarUsuarios(route.params.chatId)
-    listarIntervalo = setInterval(() => cargarUsuarios(route.params.chatId), 5000)
+    listarIntervalo = setInterval(() => cargarUsuarios(route.params.chatId), 10000)
   }
 })
 
@@ -34,13 +34,13 @@ onBeforeRouteUpdate(async (to, from, next) => {
   clearInterval(listarIntervalo)
   if (to.params.chatId) {
     await cargarUsuarios(to.params.chatId)
-    listarIntervalo = setInterval(() => cargarUsuarios(to.params.chatId), 5000)
+    listarIntervalo = setInterval(() => cargarUsuarios(to.params.chatId), 10000)
   }
   next()
 })
 
 onBeforeUnmount(() => {
-  clearInterval (listarIntervalo)
+  clearInterval(listarIntervalo)
   mapaUsuariosChatActual.value = new Map()
 })
 </script>

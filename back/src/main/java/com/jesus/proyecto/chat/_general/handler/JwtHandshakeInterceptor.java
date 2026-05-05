@@ -33,22 +33,39 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
         String cookies = servletRequest.getHeader("cookie");
 
-        if (cookies == null) return true;
+        if (cookies == null || cookies.isBlank()) {
+            return false;
+        }
+
+        String token = null;
 
         for (String cookie : cookies.split(";")) {
             String[] parts = cookie.trim().split("=");
 
-            if (parts.length == 2 && parts[0].equals("accessToken")) {
-                try {
-                    UUID userId = jwtService.extraerUsuarioId(parts[1]);
-                    attributes.put("userId", userId);
-                } catch (Exception e) {
-                    System.out.println("JWT inválido");
-                }
+            if (parts.length == 2 && "accessToken".equals(parts[0])) {
+                token = parts[1];
+                break;
             }
         }
 
-        return true;
+        if (token == null || token.isBlank()) {
+            return false;
+        }
+
+        try {
+            UUID userId = jwtService.extraerUsuarioId(token);
+
+            if (userId == null) {
+                return false;
+            }
+
+            attributes.put("userId", userId);
+            return true;
+
+        } catch (Exception e) {
+            System.out.println("JWT inválido");
+            return false;
+        }
     }
 
     @Override

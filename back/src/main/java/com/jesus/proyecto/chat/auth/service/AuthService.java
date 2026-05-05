@@ -75,11 +75,7 @@ public class AuthService {
                 .orElseThrow(() -> new MyAuthException("Usuario no encontrado"));
 
         usuario.setFechaUltimaConexion(Instant.now());
-        System.out.println();
-        System.out.println();
-        System.out.println(usuario.getFechaUltimaConexion());
-        System.out.println();
-        System.out.println();
+
         usuarioRepository.save(usuario);
 
         generarTokensYCookies(usuario, response);
@@ -208,9 +204,9 @@ public class AuthService {
 
     private Cookie generarCookie(String nombre, String token, long edad) {
         Cookie cookie = new Cookie(nombre, token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        // cookie.setSecure(false);
+        cookie.setHttpOnly(false);
+        // cookie.setSecure(true); // TODO - Eliminado para probar en desarrollo
+        cookie.setSecure(false); 
         cookie.setPath("/");
         cookie.setMaxAge((int) (edad / 1000));
         return cookie;

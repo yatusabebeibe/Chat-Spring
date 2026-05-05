@@ -26,9 +26,7 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class WebSocketFileService {
 
-    private final WebSocketSessionService sessionService;
     private final WebSocketMessageService messageService;
-    private final ObjectMapper objectMapper;
 
     @Value("${file.max-size-mb}")
     private int maxFileSizeMb;
@@ -41,10 +39,14 @@ public class WebSocketFileService {
     // BINARY
     // -------------------------
     public void handleBinary(WebSocketSession session, BinaryMessage message) {
-        SessionMessageState state = sessionService.getState(session);
+        SessionMessageState state = (SessionMessageState) session.getAttributes().get("messageState");
 
         if (state == null) {
-            mandarError(session, "No hay mensaje pendiente para enviar");
+            try {
+                session.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return;
         }
 
@@ -142,7 +144,7 @@ public class WebSocketFileService {
             error.put("error", msg);
 
             // Enviar respuesta de error en texto plano JSON
-            session.sendMessage(new TextMessage(objectMapper.writeValueAsString(error)));
+            session.sendMessage(new TextMessage((new ObjectMapper()).writeValueAsString(error)));
             // Nota: Podrías llamar a session.close() aquí si deseas desconectar inmediatamente
         } catch (Exception e) {
             // Si no podemos enviar el error, imprimir a stderr para debugging

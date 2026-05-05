@@ -21,9 +21,9 @@ import lombok.AllArgsConstructor;
 public class WebSocketRoomService {
 
     private final Map<UUID, Set<WebSocketSession>> rooms = new ConcurrentHashMap<>();
+    private final Map<UUID, Set<UUID>> sessionChats = new ConcurrentHashMap<>();
 
     private final UsuarioChatService usuarioChatService;
-    private final WebSocketSessionService sessionService;
 
     // -------------------------
     // CONEXIÓN
@@ -31,21 +31,24 @@ public class WebSocketRoomService {
     public void handleConnection(WebSocketSession session) {
         try {
             UUID userId = (UUID) session.getAttributes().get("userId");
+            if (userId == null) return;
 
-            if (userId == null) {
-                return;
-            }
+            UUID sessionId = UUID.fromString(session.getId());
 
             List<Chat> chats = usuarioChatService.listarChatsPorUsuario(userId);
 
+            Set<UUID> chatIds = new HashSet<>();
+
             for (Chat chat : chats) {
-                Set<WebSocketSession> sessions =
-                        rooms.computeIfAbsent(chat.getId(), k -> ConcurrentHashMap.newKeySet());
+                UUID chatId = chat.getId();
 
-                sessions.add(session);
+                rooms.computeIfAbsent(chatId, k -> ConcurrentHashMap.newKeySet())
+                        .add(session);
 
-                session.getAttributes().put("chatId", chat.getId());
+                chatIds.add(chatId);
             }
+
+            sessionChats.put(sessionId, chatIds);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,13 +60,19 @@ public class WebSocketRoomService {
     // -------------------------
     public void handleDisconnection(WebSocketSession session) {
         try {
-            UUID chatId = sessionService.getChatId(session);
+            UUID sessionId = UUID.fromString(session.getId());
 
-            if (chatId != null && rooms.containsKey(chatId)) {
+            Set<UUID> chats = sessionChats.remove(sessionId);
+            if (chats == null) return;
+
+            for (UUID chatId : chats) {
                 Set<WebSocketSession> sessions = rooms.get(chatId);
-
                 if (sessions != null) {
                     sessions.remove(session);
+
+                    if (sessions.isEmpty()) {
+                        rooms.remove(chatId);
+                    }
                 }
             }
 
@@ -83,16 +92,14 @@ public class WebSocketRoomService {
         // Pero mejor es filtrar isOpen() que hace lo mismo
 
         for (WebSocketSession s : new HashSet<>(sessions)) {
-            if (s.isOpen()) {
-                try {
-                    s.sendMessage(new TextMessage(msg));
-                } catch (Exception e) {
-                    // Si la conexión se rompió, no podemos enviarle mensaje. 
-                    // Se encargará de limpiarse en afterConnectionClosed.
-                    // No necesitamos hacer nada aquí, pero loguear:
-                    System.out.println("Error enviando broadcast: " + e.getMessage());
-                }
-            } else {
+            if (!s.isOpen()) {
+                sessions.remove(s);
+                continue;
+            }
+
+            try {
+                s.sendMessage(new TextMessage(msg));
+            } catch (Exception e) {
                 sessions.remove(s);
             }
         }

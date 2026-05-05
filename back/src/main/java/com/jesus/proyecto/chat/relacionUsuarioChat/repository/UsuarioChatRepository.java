@@ -32,14 +32,4 @@ public interface UsuarioChatRepository extends JpaRepository<UsuarioChat, I_Usua
         HAVING COUNT(DISTINCT uc.usuario.id) = 2
     """)
     Optional<Chat> findConversacionEntreUsuarios(UUID id1, UUID id2);
-
-    @Query("""
-        SELECT uc
-        FROM UsuarioChat uc
-        JOIN FETCH uc.chat c
-        JOIN FETCH c.miembros m
-        JOIN FETCH m.usuario
-        WHERE uc.usuario.id = :idUsuario
-    """)
-    List<UsuarioChat> findParticipacionesConMiembros(UUID idUsuario);
 }

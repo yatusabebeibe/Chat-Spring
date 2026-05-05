@@ -33,6 +33,9 @@ public class OpenAiApi implements AIProvider {
     @Value("${openai.api.key}")
     private String API_KEY;
 
+    @Value("${openai.api.audio.key}")
+    private String API_KEY_AUDIO;
+
     @Value("${openai.api.url}")
     private String URL;
 
@@ -113,7 +116,7 @@ public class OpenAiApi implements AIProvider {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-            headers.setBearerAuth(API_KEY);
+            headers.setBearerAuth(API_KEY_AUDIO);
 
             HttpEntity<MultiValueMap<String, Object>> request =
                     new HttpEntity<>(body, headers);

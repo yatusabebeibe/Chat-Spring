@@ -50,7 +50,7 @@ public class ChatQueryService {
     }
 
     public List<ChatListResponse> obtenerListaChatsUsuario(UUID idUsuario) {
-        return usuarioChatRepository.findParticipacionesConMiembros(idUsuario)
+        return usuarioChatRepository.findChatsByUsuarioId(idUsuario)
                 .stream()
                 .map(uc -> crearResponseUsuario(uc.getChat(), idUsuario))
                 .toList();

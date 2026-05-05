@@ -35,8 +35,6 @@ public class MensajeService {
     public List<MensajeResponse> obtenerMensajesChat(MensajeRequest req) {
         if (req.getChatId() == null) throw new DatosRequeridosException();
 
-        System.out.println("---------------");
-
         int limite = Paginacion.validarLimite(req.getLimite());
 
         List<Mensaje> mensajes;
@@ -54,9 +52,6 @@ public class MensajeService {
                 }
             }
         }
-
-        System.out.println(mensajes.toString());
-        System.out.println("---------------");
 
         return mensajes.stream()
                 .map(mensajeMapper::toResponse)

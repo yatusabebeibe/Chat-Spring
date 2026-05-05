@@ -36,7 +36,6 @@ public class WebSocketMessageService {
     private final UsuarioService usuarioService;
     private final ArchivoMensajeRepository archivoMensajeRepository;
 
-    private final WebSocketSessionService sessionService;
     private final WebSocketRoomService roomService;
     private final WebSocketUtils webSocketUtils;
 
@@ -79,7 +78,7 @@ public class WebSocketMessageService {
 
             state.setRutasArchivos(new HashMap<>());
 
-            sessionService.saveState(session, state);
+            session.getAttributes().put("messageState", state);
 
             Map<String, Object> response = new HashMap<>();
             response.put("type", "MESSAGE_READY");
@@ -136,7 +135,7 @@ public class WebSocketMessageService {
             }
         }
 
-        sessionService.remove(session);
+        session.getAttributes().remove("messageState");
 
         MensajeResponse msgRespuesta = mensajeMapper.toResponse(guardado);
 

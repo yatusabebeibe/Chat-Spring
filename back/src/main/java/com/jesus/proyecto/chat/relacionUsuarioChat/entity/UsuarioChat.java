@@ -20,12 +20,14 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
 @Entity
 @Table(name = "usuario_chat")
+@Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class UsuarioChat {
 

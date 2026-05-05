@@ -10,7 +10,6 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import com.jesus.proyecto.chat._general.websocket.service.WebSocketFileService;
 import com.jesus.proyecto.chat._general.websocket.service.WebSocketMessageService;
 import com.jesus.proyecto.chat._general.websocket.service.WebSocketRoomService;
-import com.jesus.proyecto.chat._general.websocket.service.WebSocketSessionService;
 
 import lombok.AllArgsConstructor;
 
@@ -21,7 +20,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     private final WebSocketFileService fileService;
     private final WebSocketRoomService roomService;
     private final WebSocketMessageService messageService;
-    private final WebSocketSessionService sessionService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -31,7 +29,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         roomService.handleDisconnection(session);
-        sessionService.remove(session);
+        session.getAttributes().remove("messageState");
     }
 
     @Override
